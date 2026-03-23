@@ -12,3 +12,6 @@ pnpm-debug.log*
 .codex
 .cursor
 .claude
+CLAUDE.md
+**/CLAUDE.md
+context
