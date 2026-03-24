@@ -9,9 +9,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 *.tgz
-.codex
-.cursor
-.claude
-CLAUDE.md
-**/CLAUDE.md
-context
+# .codex
+# .cursor
+# .claude
+# CLAUDE.md
+# **/CLAUDE.md
+# context

@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /d/Workspace/Github/my-bad-idea/NexusAdmin -type f \\\\\\(-name *.ts -o -name *.tsx -o -name *.json \\\\\\) ! -path */.git/*)",
+      "Bash(find /d/Workspace/Github/my-bad-idea/NexusAdmin -maxdepth 2 -type d ! -path */.git*)",
+      "Bash(npx create-next-app@latest nexus-admin --typescript --tailwind --app --src-dir=false --import-alias \"@/*\" --no-git --yes)",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest init --defaults -y)",
+      "Bash(npx shadcn@latest add input label form dialog sheet badge select checkbox dropdown-menu tooltip avatar separator --yes)",
+      "Bash(cd:*)",
+      "Bash(npx msw:*)",
+      "Bash(mkdir -p \"D:/Workspace/Github/my-bad-idea/NexusAdmin/nexus-admin/app/[locale]/\\(admin\\)/dashboard\")",
+      "Bash(mkdir -p \"D:/Workspace/Github/my-bad-idea/NexusAdmin/nexus-admin/app/[locale]/\\(admin\\)/users\")",
+      "Bash(mkdir -p \"D:/Workspace/Github/my-bad-idea/NexusAdmin/nexus-admin/app/[locale]/\\(admin\\)/403\")",
+      "Bash(mkdir -p \"D:/Workspace/Github/my-bad-idea/NexusAdmin/nexus-admin/app/[locale]/login\")",
+      "Bash(npx tsc:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run:*)",
+      "Bash(grep -E \"\\\\.tsx$\")",
+      "Bash(npx next:*)",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}
