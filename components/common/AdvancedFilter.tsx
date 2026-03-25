@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { DatePicker } from './DatePicker';
 
@@ -63,6 +64,7 @@ function blurSelect(e: React.FocusEvent<HTMLSelectElement>) {
 }
 
 export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply, onReset }: AdvancedFilterProps) {
+  const t = useTranslations();
   const drawerRef = useRef<HTMLDivElement>(null);
 
   // Lock body scroll when open
@@ -105,7 +107,7 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
             style={inputStyle}
             value={(value[field.key] as string) ?? ''}
             onChange={(e) => onChange({ ...value, [field.key]: e.target.value })}
-            placeholder={field.key === 'keyword' ? 'Name, email or ID...' : `e.g. ${field.label.toLowerCase()}...`}
+            placeholder={field.key === 'keyword' ? t('advFilter.keywordPlaceholder') : field.key === 'tags' ? t('advFilter.tagsPlaceholder') : `${field.label}...`}
             onFocus={focusAccent}
             onBlur={blurAccent}
           />
@@ -238,7 +240,7 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
             display: 'flex', alignItems: 'center', gap: '8px',
           }}>
             <SlidersHorizontal size={14} />
-            Advanced Filters
+            {t('advFilter.title')}
             {activeCount > 0 && (
               <span style={{
                 background: 'var(--accent)', color: '#fff',
@@ -270,7 +272,7 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
           {/* Active chips */}
           {chips.length > 0 && (
             <div>
-              <div style={{ ...labelStyle, marginBottom: '6px' }}>Active Filters</div>
+              <div style={{ ...labelStyle, marginBottom: '6px' }}>{t('advFilter.activeFilters')}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {chips.map(([key, val]) => {
                   const field = fields.find((f) => f.key === key);
@@ -350,7 +352,7 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
               transition: 'all .15s',
             }}
           >
-            Clear All
+            {t('advFilter.clearAll')}
           </button>
           <button
             onClick={() => { onApply(); onClose(); }}
@@ -362,7 +364,7 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
               transition: 'all .15s',
             }}
           >
-            Apply Filters
+            {t('advFilter.applyFilters')}
           </button>
         </div>
       </div>

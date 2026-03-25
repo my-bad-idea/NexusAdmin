@@ -133,12 +133,23 @@
     "write": "書き込み",
     "deletePermission": "削除",
     "adminAccess": "管理者アクセス",
-    "tags": "タグ"
+    "tags": "タグ",
+    "title": "詳細フィルター",
+    "activeFilters": "有効なフィルター",
+    "clearAll": "すべてクリア",
+    "applyFilters": "フィルター適用",
+    "keywordPlaceholder": "名前、メールまたはID...",
+    "tagsPlaceholder": "例: タグ..."
   },
   "confirm": {
     "cancel": "キャンセル",
     "delete": "削除",
-    "confirm": "確認"
+    "confirm": "確認",
+    "typeToConfirmBefore": "",
+    "typeToConfirmAfter": " と入力して確認：",
+    "confirmWord": "確認",
+    "itemCount": "（{count} 件）",
+    "itemCountSingle": "（{count} 件）"
   },
   "datePicker": {
     "placeholder": "日付を選択",

@@ -91,7 +91,7 @@ export function ConfirmDialog({
                 {description}
                 {count !== undefined && (
                   <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--txt-sec)' }}>
-                    {' '}({count} item{count !== 1 ? 's' : ''})
+                    {' '}{count === 1 ? t('confirm.itemCountSingle', { count }) : t('confirm.itemCount', { count })}
                   </span>
                 )}
               </DialogDescription>
@@ -102,7 +102,7 @@ export function ConfirmDialog({
         {isDanger && (
           <div className="mt-2">
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--txt-sec)', marginBottom: '6px' }}>
-              Type <strong style={{ color: 'var(--danger)' }}>{confirmText}</strong> to confirm:
+              {t('confirm.typeToConfirmBefore')}<strong style={{ color: 'var(--danger)' }}>{confirmText}</strong>{t('confirm.typeToConfirmAfter')}
             </p>
             <input
               type="text"

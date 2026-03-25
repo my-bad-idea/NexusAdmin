@@ -133,12 +133,23 @@
     "write": "写入",
     "deletePermission": "删除",
     "adminAccess": "管理员权限",
-    "tags": "标签"
+    "tags": "标签",
+    "title": "高级筛选",
+    "activeFilters": "已启用筛选",
+    "clearAll": "全部重置",
+    "applyFilters": "应用筛选",
+    "keywordPlaceholder": "姓名、邮箱或 ID...",
+    "tagsPlaceholder": "例如 标签..."
   },
   "confirm": {
     "cancel": "取消",
     "delete": "删除",
-    "confirm": "确认"
+    "confirm": "确认",
+    "typeToConfirmBefore": "输入 ",
+    "typeToConfirmAfter": " 以确认：",
+    "confirmWord": "确认",
+    "itemCount": "（{count} 项）",
+    "itemCountSingle": "（{count} 项）"
   },
   "datePicker": {
     "placeholder": "选择日期",

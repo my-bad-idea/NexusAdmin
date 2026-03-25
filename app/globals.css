@@ -272,3 +272,23 @@
     line-height: var(--leading-normal);
   }
 }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-w: 0px;
+    --page-px: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --page-px: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --page-px: 10px;
+  }
+}

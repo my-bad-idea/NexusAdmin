@@ -297,7 +297,7 @@ export function DataTable<T extends { id: string }>({
               color: 'var(--txt-muted)',
             }}
           >
-            <div className="pagination-info">
+            <div className="pagination-info max-[480px]:hidden">
               Showing{' '}
               <span style={{ fontFamily: 'var(--font-mono-custom)', fontWeight: 500, color: 'var(--txt-sec)' }}>
                 {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)}
@@ -366,7 +366,7 @@ export function DataTable<T extends { id: string }>({
                 <ChevronRight size={12} />
               </button>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="hidden md:flex items-center gap-1.5">
               <span style={{ fontSize: '11px', color: 'var(--txt-muted)' }}>Per page</span>
               <select
                 value={pageSize}

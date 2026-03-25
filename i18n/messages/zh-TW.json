@@ -133,12 +133,23 @@
     "write": "寫入",
     "deletePermission": "刪除",
     "adminAccess": "管理員權限",
-    "tags": "標籤"
+    "tags": "標籤",
+    "title": "進階篩選",
+    "activeFilters": "已啟用篩選",
+    "clearAll": "全部重置",
+    "applyFilters": "套用篩選",
+    "keywordPlaceholder": "姓名、郵箱或 ID...",
+    "tagsPlaceholder": "例如 標籤..."
   },
   "confirm": {
     "cancel": "取消",
     "delete": "刪除",
-    "confirm": "確認"
+    "confirm": "確認",
+    "typeToConfirmBefore": "輸入 ",
+    "typeToConfirmAfter": " 以確認：",
+    "confirmWord": "確認",
+    "itemCount": "（{count} 項）",
+    "itemCountSingle": "（{count} 項）"
   },
   "datePicker": {
     "placeholder": "選擇日期",

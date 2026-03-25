@@ -19,7 +19,7 @@ import { createUserColumns } from './columns';
 import { fetchUsers, createUser, updateUser, deleteUser, batchDisableUsers } from '@/queries/users';
 import { UserProfile } from '@/types/user';
 import { UserSchemaData } from './schema';
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { Search, SlidersHorizontal, Plus, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { DatePicker } from '@/components/common/DatePicker';
 
@@ -192,15 +192,18 @@ export function UserList() {
         <div className="flex items-center gap-2 flex-wrap">
           {canWrite && (
             <PrimaryButton onClick={() => { setEditUser(undefined); setFormOpen(true); }}>
-              {t('users.addUser')}
+              <Plus size={14} className="md:mr-1" />
+              <span className="hidden md:inline">{t('users.addUser')}</span>
             </PrimaryButton>
           )}
           {canExport && (
             <OutlineButton onClick={() => toast(t('users.exporting'))}>
-              {t('users.export')}
+              <Download size={14} className="md:mr-1" />
+              <span className="hidden md:inline">{t('users.export')}</span>
             </OutlineButton>
           )}
           <WarnButton
+            className="max-[480px]:hidden"
             disabled={selectedIds.length === 0}
             onClick={() => {
               if (selectedIds.length > 0) batchDisableAction.mutate(selectedIds);
@@ -210,6 +213,7 @@ export function UserList() {
           </WarnButton>
           {canDelete && (
             <DestructiveButton
+              className="max-[480px]:hidden"
               disabled={selectedIds.length === 0}
               onClick={() => {
                 if (selectedIds.length > 0) setBatchDeleteOpen(true);
@@ -226,7 +230,7 @@ export function UserList() {
         className="flex flex-wrap items-center gap-2 mb-[10px] rounded-[var(--radius-md)] px-3 py-2"
         style={{ background: 'var(--white)', border: '1px solid var(--border)' }}
       >
-        <div className="relative flex-1 min-w-[160px]">
+        <div className="relative flex-1 min-w-[160px] max-[480px]:min-w-full">
           <Search
             size={12}
             className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none"
@@ -255,7 +259,7 @@ export function UserList() {
         <select
           value={list.filters.role ?? ''}
           onChange={(e) => list.setFilter('role', e.target.value)}
-          className="shrink-0"
+          className="shrink-0 max-[480px]:min-w-full"
           style={{
             height: '28px', padding: '0 24px 0 8px', minWidth: '120px',
             border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
@@ -274,7 +278,7 @@ export function UserList() {
         <select
           value={list.filters.status ?? ''}
           onChange={(e) => list.setFilter('status', e.target.value)}
-          className="shrink-0"
+          className="shrink-0 max-[480px]:min-w-full"
           style={{
             height: '28px', padding: '0 24px 0 8px', minWidth: '120px',
             border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
@@ -290,16 +294,18 @@ export function UserList() {
           <option value="Inactive">Inactive</option>
           <option value="Suspended">Suspended</option>
         </select>
-        <DatePicker
-          value={list.filters.dateFrom ?? ''}
-          onChange={(v) => list.setFilter('dateFrom', v)}
-          className="shrink-0"
-          style={{
-            height: '28px', minWidth: '160px',
-            fontSize: '11px', fontFamily: 'var(--font-mono-custom)',
-          }}
-        />
-        <div className="flex gap-1.5 ml-auto">
+        <div className="hidden lg:block shrink-0">
+          <DatePicker
+            value={list.filters.dateFrom ?? ''}
+            onChange={(v) => list.setFilter('dateFrom', v)}
+            className="shrink-0"
+            style={{
+              height: '28px', minWidth: '160px',
+              fontSize: '11px', fontFamily: 'var(--font-mono-custom)',
+            }}
+          />
+        </div>
+        <div className="flex gap-1.5 ml-auto w-full md:w-auto">
           <PrimaryButton
             onClick={() => list.refetch()}
             className="h-[28px] px-3 text-[12px]"
@@ -390,7 +396,7 @@ export function UserList() {
         type="danger"
         title={t('users.deleteTitle')}
         description={t('users.deleteDesc', { name: deleteTarget?.name ?? '' })}
-        confirmText="confirm"
+        confirmText={t('confirm.confirmWord')}
         onConfirm={() => deleteAction.mutateAsync(deleteTarget!.id)}
         onCancel={() => setDeleteTarget(undefined)}
       />
@@ -402,7 +408,7 @@ export function UserList() {
         title={t('users.batchDeleteTitle')}
         description={t('users.batchDeleteDesc')}
         count={selectedIds.length}
-        confirmText="confirm"
+        confirmText={t('confirm.confirmWord')}
         onConfirm={async () => {
           await Promise.all(selectedIds.map((id) => deleteUser(id)));
           await list.refetch();

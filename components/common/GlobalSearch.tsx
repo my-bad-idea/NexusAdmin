@@ -88,8 +88,7 @@ export function GlobalSearch() {
   return (
     <div
       ref={ref}
-      className="relative"
-      style={{ flex: 1, maxWidth: '320px', marginLeft: '12px' }}
+      className="relative flex-1 max-w-[320px] max-[1024px]:max-w-[220px] ml-3"
     >
       <Search
         size={13}

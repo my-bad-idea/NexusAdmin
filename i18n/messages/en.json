@@ -133,12 +133,23 @@
     "write": "Write",
     "deletePermission": "Delete",
     "adminAccess": "Admin Access",
-    "tags": "Tags"
+    "tags": "Tags",
+    "title": "Advanced Filters",
+    "activeFilters": "Active Filters",
+    "clearAll": "Clear All",
+    "applyFilters": "Apply Filters",
+    "keywordPlaceholder": "Name, email or ID...",
+    "tagsPlaceholder": "e.g. tags..."
   },
   "confirm": {
     "cancel": "Cancel",
     "delete": "Delete",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "typeToConfirmBefore": "Type ",
+    "typeToConfirmAfter": " to confirm:",
+    "confirmWord": "confirm",
+    "itemCount": "({count} items)",
+    "itemCountSingle": "({count} item)"
   },
   "datePicker": {
     "placeholder": "Select date",
