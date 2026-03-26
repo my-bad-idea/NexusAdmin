@@ -1,7 +1,30 @@
 import type { Metadata } from 'next';
 import { cookies, headers } from 'next/headers';
+import { Bricolage_Grotesque, DM_Mono, Instrument_Sans } from 'next/font/google';
 import { resolveLocale, toLanguageTag } from '@/lib/locale';
 import './globals.css';
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  variable: '--font-display-custom',
+  display: 'swap',
+});
+
+const dmMono = DM_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-mono-custom',
+  display: 'swap',
+});
+
+const instrumentSans = Instrument_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  style: ['normal', 'italic'],
+  variable: '--font-sans',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'NexusAdmin',
@@ -21,13 +44,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   );
   const languageTag = toLanguageTag(locale);
   return (
-    <html lang={languageTag} suppressHydrationWarning>
+    <html lang={languageTag} className={`${bricolage.variable} ${dmMono.variable} ${instrumentSans.variable}`} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700&family=DM+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap"
-          rel="stylesheet"
-        />
         <script
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var s=localStorage.getItem('nexus-theme');var mode=s?JSON.parse(s).state?.mode:'system';var isDark=mode==='dark'||(mode!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(isDark)document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();`,

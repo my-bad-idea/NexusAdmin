@@ -104,10 +104,44 @@
     "success": "Signed in successfully"
   },
   "search": {
-    "pages": "Pages",
+    "pagesLabel": "Pages",
     "users": "Users",
     "searching": "Searching...",
-    "noResults": "No results found"
+    "noResults": "No results found",
+    "pages": {
+      "dashboard": "Dashboard",
+      "userList": "User List",
+      "roles": "Roles & Permissions",
+      "orders": "Orders",
+      "products": "Products",
+      "analytics": "Analytics",
+      "settings": "Settings"
+    },
+    "kw": {
+      "dashboard": "dashboard",
+      "home": "home",
+      "overview": "overview",
+      "user": "user",
+      "list": "list",
+      "management": "management",
+      "member": "member",
+      "role": "role",
+      "permission": "permission",
+      "access": "access",
+      "privilege": "privilege",
+      "order": "order",
+      "purchase": "purchase",
+      "product": "product",
+      "item": "item",
+      "catalog": "catalog",
+      "analytics": "analytics",
+      "chart": "chart",
+      "report": "report",
+      "statistics": "statistics",
+      "settings": "settings",
+      "config": "config",
+      "preference": "preference"
+    }
   },
   "theme": {
     "system": "System",

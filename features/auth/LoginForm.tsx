@@ -11,6 +11,7 @@ import { apiFetch } from '@/lib/fetch';
 import { useAuthStore } from '@/store/authStore';
 import { LoginResponse } from '@/types/auth';
 import { loginSchema, LoginFormData } from './loginSchema';
+import { cn } from '@/lib/utils';
 
 export function LoginForm() {
   const router = useRouter();
@@ -43,41 +44,28 @@ export function LoginForm() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center"
-      style={{ background: 'var(--bg)' }}
-    >
-      <div
-        className="w-full max-w-sm rounded-[var(--radius-lg)] p-8"
-        style={{
-          background: 'var(--white)',
-          boxShadow: 'var(--shadow-2)',
-          border: '1px solid var(--border)',
-        }}
-      >
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg)]">
+      <div className="w-full max-w-sm rounded-[var(--radius-lg)] p-8 bg-[var(--white)] shadow-[var(--shadow-2)] border border-[var(--border)]">
         {/* Logo */}
         <div className="flex items-center gap-2 mb-6">
-          <div
-            className="flex items-center justify-center rounded"
-            style={{ width: '32px', height: '32px', borderRadius: '6px', background: 'var(--accent)', color: 'var(--on-accent)', fontSize: '16px', fontWeight: 700 }}
-          >
+          <div className="flex items-center justify-center w-8 h-8 rounded-[6px] bg-[var(--accent)] text-[var(--on-accent)] text-[16px] font-bold">
             N
           </div>
-          <span style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: 'var(--txt)' }}>
+          <span className="text-[var(--text-xl)] font-[var(--font-bold)] text-[var(--txt)]">
             NexusAdmin
           </span>
         </div>
 
-        <h1 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-bold)', color: 'var(--txt)', marginBottom: '4px' }}>
+        <h1 className="text-[var(--text-lg)] font-[var(--font-bold)] text-[var(--txt)] mb-1">
           {t('auth.signIn')}
         </h1>
-        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--txt-muted)', marginBottom: '24px' }}>
+        <p className="text-[var(--text-sm)] text-[var(--txt-muted)] mb-6">
           {t('auth.subtitle')}
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" style={{ fontSize: 'var(--text-sm)', color: 'var(--label-text)', fontWeight: 500 }}>
+            <label htmlFor="email" className="text-[var(--text-sm)] text-[var(--label-text)] font-medium">
               {t('auth.email')}
             </label>
             <input
@@ -85,34 +73,15 @@ export function LoginForm() {
               type="email"
               placeholder="admin@nexus.com"
               {...register('email')}
-              style={{
-                height: 'var(--input-height)',
-                width: '100%',
-                padding: '0 10px',
-                border: `1px solid ${errors.email ? 'var(--input-border-error)' : 'var(--input-border-default)'}`,
-                borderRadius: 'var(--input-radius)',
-                fontSize: 'var(--text-sm)',
-                background: 'var(--input-bg-default)',
-                color: 'var(--input-text-default)',
-                outline: 'none',
-                transition: 'border-color .15s, box-shadow .15s',
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--input-border-focus)';
-                e.currentTarget.style.boxShadow = 'var(--input-ring-focus)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = errors.email ? 'var(--input-border-error)' : 'var(--input-border-default)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
+              className={cn('nx-input', errors.email && 'nx-input-error')}
             />
             {errors.email && (
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--error-text)' }}>{errors.email.message}</p>
+              <p className="text-[var(--text-xs)] text-[var(--error-text)]">{errors.email.message}</p>
             )}
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" style={{ fontSize: 'var(--text-sm)', color: 'var(--label-text)', fontWeight: 500 }}>
+            <label htmlFor="password" className="text-[var(--text-sm)] text-[var(--label-text)] font-medium">
               {t('auth.password')}
             </label>
             <input
@@ -120,29 +89,10 @@ export function LoginForm() {
               type="password"
               placeholder="••••••••"
               {...register('password')}
-              style={{
-                height: 'var(--input-height)',
-                width: '100%',
-                padding: '0 10px',
-                border: `1px solid ${errors.password ? 'var(--input-border-error)' : 'var(--input-border-default)'}`,
-                borderRadius: 'var(--input-radius)',
-                fontSize: 'var(--text-sm)',
-                background: 'var(--input-bg-default)',
-                color: 'var(--input-text-default)',
-                outline: 'none',
-                transition: 'border-color .15s, box-shadow .15s',
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--input-border-focus)';
-                e.currentTarget.style.boxShadow = 'var(--input-ring-focus)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = errors.password ? 'var(--input-border-error)' : 'var(--input-border-default)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
+              className={cn('nx-input', errors.password && 'nx-input-error')}
             />
             {errors.password && (
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--error-text)' }}>{errors.password.message}</p>
+              <p className="text-[var(--text-xs)] text-[var(--error-text)]">{errors.password.message}</p>
             )}
           </div>
 
@@ -152,7 +102,7 @@ export function LoginForm() {
         </form>
 
         <div className="mt-6 pt-4 border-t border-[var(--border)]">
-          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--txt-muted)', textAlign: 'center' }}>
+          <p className="text-[var(--text-xs)] text-[var(--txt-muted)] text-center">
             {t('auth.demo')}
           </p>
         </div>

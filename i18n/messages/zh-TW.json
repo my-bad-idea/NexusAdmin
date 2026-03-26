@@ -104,10 +104,44 @@
     "success": "登入成功"
   },
   "search": {
-    "pages": "頁面",
+    "pagesLabel": "頁面",
     "users": "使用者",
     "searching": "搜尋中...",
-    "noResults": "未找到結果"
+    "noResults": "未找到結果",
+    "pages": {
+      "dashboard": "儀表盤",
+      "userList": "用戶列表",
+      "roles": "角色與權限",
+      "orders": "訂單",
+      "products": "產品",
+      "analytics": "數據分析",
+      "settings": "系統設定"
+    },
+    "kw": {
+      "dashboard": "儀表盤",
+      "home": "首頁",
+      "overview": "概覽",
+      "user": "用戶",
+      "list": "列表",
+      "management": "管理",
+      "member": "成員",
+      "role": "角色",
+      "permission": "權限",
+      "access": "存取",
+      "privilege": "特權",
+      "order": "訂單",
+      "purchase": "採購",
+      "product": "產品",
+      "item": "商品",
+      "catalog": "目錄",
+      "analytics": "分析",
+      "chart": "圖表",
+      "report": "報表",
+      "statistics": "統計",
+      "settings": "設定",
+      "config": "配置",
+      "preference": "偏好"
+    }
   },
   "theme": {
     "system": "跟隨系統",

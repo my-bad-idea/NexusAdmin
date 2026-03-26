@@ -9,6 +9,7 @@ import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import { GhostButton } from '@/components/ui/GhostButton';
 import { UserProfile } from '@/types/user';
 import { userSchema, UserSchemaData } from './schema';
+import { cn } from '@/lib/utils';
 
 interface UserFormProps {
   mode: 'create' | 'edit';
@@ -19,61 +20,22 @@ interface UserFormProps {
   isPending?: boolean;
 }
 
-const DEPARTMENTS = ['Engineering', 'Product', 'Design', 'Marketing'];
-const ROLES = ['Admin', 'Editor', 'Viewer'] as const;
-const STATUSES = ['Active', 'Inactive', 'Suspended'] as const;
-
-/* ── Shared native control styles (matching FilterBar / AdvancedFilter) ── */
-
-const inputStyle: React.CSSProperties = {
-  height: 'var(--input-height)',
-  width: '100%',
-  padding: '0 10px',
-  border: '1px solid var(--input-border-default)',
-  borderRadius: 'var(--input-radius)',
-  fontSize: 'var(--text-sm)',
-  background: 'var(--input-bg-default)',
-  color: 'var(--input-text-default)',
-  outline: 'none',
-  transition: 'border-color .15s, box-shadow .15s',
-};
-
-const selectStyle: React.CSSProperties = {
-  height: 'var(--input-height)',
-  width: '100%',
-  padding: '0 28px 0 10px',
-  border: '1px solid var(--input-border-default)',
-  borderRadius: 'var(--input-radius)',
-  fontSize: 'var(--text-sm)',
-  color: 'var(--input-text-default)',
-  cursor: 'pointer',
-  outline: 'none',
-  transition: 'border-color .15s, box-shadow .15s',
-  WebkitAppearance: 'none',
-  appearance: 'none' as const,
-  background: `var(--input-bg-default) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center`,
-};
-
-const labelStyle: React.CSSProperties = {
-  fontSize: 'var(--text-sm)',
-  color: 'var(--label-text)',
-  fontWeight: 500,
-};
-
-const errorStyle: React.CSSProperties = {
-  fontSize: 'var(--text-xs)',
-  color: 'var(--error-text)',
-};
-
-function handleFocus(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) {
-  e.currentTarget.style.borderColor = 'var(--input-border-focus)';
-  e.currentTarget.style.boxShadow = 'var(--input-ring-focus)';
-}
-
-function handleBlur(e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) {
-  e.currentTarget.style.borderColor = 'var(--input-border-default)';
-  e.currentTarget.style.boxShadow = 'none';
-}
+const DEPARTMENTS = [
+  { value: 'Engineering', labelKey: 'enums.dept.engineering' },
+  { value: 'Product', labelKey: 'enums.dept.product' },
+  { value: 'Design', labelKey: 'enums.dept.design' },
+  { value: 'Marketing', labelKey: 'enums.dept.marketing' },
+];
+const ROLES = [
+  { value: 'Admin', labelKey: 'roles.admin' },
+  { value: 'Editor', labelKey: 'roles.editor' },
+  { value: 'Viewer', labelKey: 'roles.viewer' },
+] as const;
+const STATUSES = [
+  { value: 'Active', labelKey: 'enums.status.active' },
+  { value: 'Inactive', labelKey: 'enums.status.inactive' },
+  { value: 'Suspended', labelKey: 'enums.status.suspended' },
+] as const;
 
 export function UserForm({ mode, initialData, open, onClose, onSubmit, isPending }: UserFormProps) {
   const t = useTranslations();
@@ -120,16 +82,9 @@ export function UserForm({ mode, initialData, open, onClose, onSubmit, isPending
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-      <DialogContent
-        style={{
-          maxWidth: 'var(--dialog-max-w)',
-          background: 'var(--dialog-bg)',
-          borderRadius: 'var(--dialog-radius)',
-          boxShadow: 'var(--dialog-shadow)',
-        }}
-      >
+      <DialogContent className="max-w-[var(--dialog-max-w)] bg-[var(--dialog-bg)] rounded-[var(--dialog-radius)] shadow-[var(--dialog-shadow)]">
         <DialogHeader>
-          <DialogTitle style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--font-bold)', color: 'var(--txt)' }}>
+          <DialogTitle className="text-[var(--text-md)] font-[var(--font-bold)] text-[var(--txt)]">
             {mode === 'create' ? t('users.addTitle') : t('users.editTitle')}
           </DialogTitle>
         </DialogHeader>
@@ -138,94 +93,75 @@ export function UserForm({ mode, initialData, open, onClose, onSubmit, isPending
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-3">
             {/* Name */}
             <div className="flex flex-col gap-1">
-              <label style={labelStyle}>
-                {t('users.name')} <span style={{ color: 'var(--label-required)' }}>*</span>
+              <label className="text-[var(--text-sm)] text-[var(--label-text)] font-medium">
+                {t('users.name')} <span className="text-[var(--label-required)]">*</span>
               </label>
               <input
                 {...register('name')}
                 placeholder={t('users.namePlaceholder')}
-                style={{
-                  ...inputStyle,
-                  borderColor: errors.name ? 'var(--input-border-error)' : undefined,
-                }}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                className={cn('nx-input', errors.name && 'nx-input-error')}
               />
-              {errors.name && <p style={errorStyle}>{errors.name.message}</p>}
+              {errors.name && <p className="text-[var(--text-xs)] text-[var(--error-text)]">{errors.name.message}</p>}
             </div>
 
             {/* Email */}
             <div className="flex flex-col gap-1">
-              <label style={labelStyle}>
-                {t('users.email')} <span style={{ color: 'var(--label-required)' }}>*</span>
+              <label className="text-[var(--text-sm)] text-[var(--label-text)] font-medium">
+                {t('users.email')} <span className="text-[var(--label-required)]">*</span>
               </label>
               <input
                 {...register('email')}
                 type="email"
                 placeholder={t('users.emailPlaceholder')}
-                style={{
-                  ...inputStyle,
-                  borderColor: errors.email ? 'var(--input-border-error)' : undefined,
-                }}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                className={cn('nx-input', errors.email && 'nx-input-error')}
               />
-              {errors.email && <p style={errorStyle}>{errors.email.message}</p>}
+              {errors.email && <p className="text-[var(--text-xs)] text-[var(--error-text)]">{errors.email.message}</p>}
             </div>
 
             {/* Department */}
             <div className="flex flex-col gap-1">
-              <label style={labelStyle}>
-                {t('users.department')} <span style={{ color: 'var(--label-required)' }}>*</span>
+              <label className="text-[var(--text-sm)] text-[var(--label-text)] font-medium">
+                {t('users.department')} <span className="text-[var(--label-required)]">*</span>
               </label>
               <select
                 value={watch('department') ?? ''}
                 onChange={(e) => setValue('department', e.target.value)}
-                style={{
-                  ...selectStyle,
-                  borderColor: errors.department ? 'var(--input-border-error)' : undefined,
-                }}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                className={cn('nx-select', errors.department && 'nx-input-error')}
               >
                 <option value="" disabled>{t('users.selectDepartment')}</option>
-                {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
+                {DEPARTMENTS.map((d) => <option key={d.value} value={d.value}>{t(d.labelKey)}</option>)}
               </select>
-              {errors.department && <p style={errorStyle}>{errors.department.message}</p>}
+              {errors.department && <p className="text-[var(--text-xs)] text-[var(--error-text)]">{errors.department.message}</p>}
             </div>
 
             {/* Role */}
             <div className="flex flex-col gap-1">
-              <label style={labelStyle}>
-                {t('users.role')} <span style={{ color: 'var(--label-required)' }}>*</span>
+              <label className="text-[var(--text-sm)] text-[var(--label-text)] font-medium">
+                {t('users.role')} <span className="text-[var(--label-required)]">*</span>
               </label>
               <select
                 value={watch('role')}
-                onChange={(e) => setValue('role', e.target.value as typeof ROLES[number])}
-                style={selectStyle}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                onChange={(e) => setValue('role', e.target.value as typeof ROLES[number]['value'])}
+                className="nx-select"
               >
-                {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+                {ROLES.map((r) => <option key={r.value} value={r.value}>{t(r.labelKey)}</option>)}
               </select>
-              {errors.role && <p style={errorStyle}>{errors.role.message}</p>}
+              {errors.role && <p className="text-[var(--text-xs)] text-[var(--error-text)]">{errors.role.message}</p>}
             </div>
 
             {/* Status */}
-            <div className="flex flex-col gap-1 md:col-span-2" style={{ maxWidth: '200px' }}>
-              <label style={labelStyle}>
-                {t('users.status')} <span style={{ color: 'var(--label-required)' }}>*</span>
+            <div className="flex flex-col gap-1 md:col-span-2 max-w-[200px]">
+              <label className="text-[var(--text-sm)] text-[var(--label-text)] font-medium">
+                {t('users.status')} <span className="text-[var(--label-required)]">*</span>
               </label>
               <select
                 value={watch('status')}
-                onChange={(e) => setValue('status', e.target.value as typeof STATUSES[number])}
-                style={selectStyle}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
+                onChange={(e) => setValue('status', e.target.value as typeof STATUSES[number]['value'])}
+                className="nx-select"
               >
-                {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                {STATUSES.map((s) => <option key={s.value} value={s.value}>{t(s.labelKey)}</option>)}
               </select>
-              {errors.status && <p style={errorStyle}>{errors.status.message}</p>}
+              {errors.status && <p className="text-[var(--text-xs)] text-[var(--error-text)]">{errors.status.message}</p>}
             </div>
           </div>
 

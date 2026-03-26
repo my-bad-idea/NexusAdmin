@@ -1,3 +1,11 @@
+/**
+ * Template hook for standard list pages (Orders, Products, etc.).
+ * Combines useList, useAction, and usePermission into a single API.
+ *
+ * Note: UserList intentionally does NOT use this template because it has
+ * grown beyond the template's scope (batch operations, advanced filter drawer,
+ * form modal state). New simpler list pages should prefer this hook.
+ */
 'use client';
 
 import { useState } from 'react';

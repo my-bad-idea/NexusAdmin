@@ -8,16 +8,24 @@ interface FetchUsersParams {
   keyword?: string;
   role?: string;
   status?: string;
+  department?: string;
+  createdDate?: string;
+  lastLogin?: string;
+  permissions?: string;
+  tags?: string;
+  sort?: string;
   [key: string]: unknown;
 }
 
 export function fetchUsers(params: FetchUsersParams): Promise<PageData<UserProfile>> {
   const p = new URLSearchParams();
-  if (params.page)     p.set('page',    String(params.page));
-  if (params.pageSize) p.set('size',    String(params.pageSize));
-  if (params.keyword)  p.set('keyword', String(params.keyword));
-  if (params.role)     p.set('role',    String(params.role));
-  if (params.status)   p.set('status',  String(params.status));
+  const keys = ['keyword', 'role', 'status', 'department', 'createdDate', 'lastLogin', 'permissions', 'tags', 'sort'] as const;
+  if (params.page)     p.set('page', String(params.page));
+  if (params.pageSize) p.set('size', String(params.pageSize));
+  for (const k of keys) {
+    const v = params[k];
+    if (v) p.set(k, String(v));
+  }
   return apiFetch<PageData<UserProfile>>(`/api/users?${p.toString()}`);
 }
 

@@ -49,60 +49,6 @@ function useDropdown() {
   return { open, toggle, close, ref };
 }
 
-/* ── Shared dropdown styles ── */
-
-const dropdownBtnStyle: React.CSSProperties = {
-  display: 'flex', alignItems: 'center', gap: '6px',
-  height: '32px', padding: '0 10px',
-  borderRadius: 'var(--radius-sm)',
-  border: '1px solid var(--border)', background: 'var(--bg)',
-  color: 'var(--txt-sec)', fontSize: '13px', fontFamily: 'inherit',
-  cursor: 'pointer', transition: 'border-color .15s, background .15s',
-  whiteSpace: 'nowrap',
-};
-
-const panelStyle = (open: boolean, width: string): React.CSSProperties => ({
-  position: 'absolute', right: 0, top: 'calc(100% + 6px)',
-  background: 'var(--white)', border: '1px solid var(--border)',
-  borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-lg)',
-  opacity: open ? 1 : 0,
-  transform: open ? 'translateY(0) scale(1)' : 'translateY(-6px) scale(.98)',
-  pointerEvents: open ? 'all' : 'none',
-  transition: 'opacity .18s, transform .18s',
-  zIndex: 300,
-  width,
-});
-
-const menuItemStyle: React.CSSProperties = {
-  display: 'flex', alignItems: 'center', gap: '10px',
-  padding: '9px 16px', fontSize: '13px', cursor: 'pointer',
-  transition: 'background .12s', width: '100%',
-  textAlign: 'left', color: 'var(--txt)',
-  border: 'none', background: 'transparent', fontFamily: 'inherit',
-};
-
-const menuRowStyle: React.CSSProperties = {
-  display: 'flex', alignItems: 'center', gap: '10px',
-  padding: '7px 16px', fontSize: '13px',
-};
-
-const miniSelectStyle: React.CSSProperties = {
-  marginLeft: 'auto',
-  height: '26px', padding: '0 22px 0 8px',
-  border: '1px solid var(--border)', borderRadius: '4px',
-  fontSize: '12px', fontFamily: 'var(--font-mono-custom)',
-  color: 'var(--txt-sec)', cursor: 'pointer', outline: 'none',
-  transition: 'border-color .15s',
-  WebkitAppearance: 'none', appearance: 'none' as const,
-  background: `var(--bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 5px center`,
-};
-
-const dividerStyle: React.CSSProperties = {
-  height: '1px', background: 'var(--border)', margin: '4px 0',
-};
-
-const iconStyle: React.CSSProperties = { width: '16px', textAlign: 'center', opacity: 0.6, flexShrink: 0 };
-
 /* ── Breadcrumb ── */
 
 function Breadcrumb() {
@@ -113,17 +59,37 @@ function Breadcrumb() {
 
   if (info.parentKey) {
     return (
-      <nav className="flex items-center gap-1.5 shrink-0" style={{ fontSize: '13px', color: 'var(--txt-muted)' }}>
+      <nav className="flex items-center gap-1.5 shrink-0 text-[13px] text-[var(--txt-muted)]">
         <span className="hidden md:inline">{t(info.parentKey)}</span>
-        <span className="hidden md:inline" style={{ color: 'var(--border)' }}>/</span>
-        <span style={{ color: 'var(--txt)', fontWeight: 500 }}>{t(info.currentKey)}</span>
+        <span className="hidden md:inline text-[var(--border)]">/</span>
+        <span className="text-[var(--txt)] font-medium">{t(info.currentKey)}</span>
       </nav>
     );
   }
   return (
-    <span className="shrink-0" style={{ fontSize: '13px', color: 'var(--txt)', fontWeight: 500 }}>
+    <span className="shrink-0 text-[13px] text-[var(--txt)] font-medium">
       {t(info.currentKey)}
     </span>
+  );
+}
+
+/* ── Panel wrapper for dropdowns ── */
+
+function DropdownPanel({ open, width, children }: { open: boolean; width: string; children: React.ReactNode }) {
+  return (
+    <div
+      className="absolute right-0 top-[calc(100%+6px)] rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--white)] transition-[opacity,transform] duration-[180ms]"
+      style={{
+        boxShadow: 'var(--shadow-lg)',
+        opacity: open ? 1 : 0,
+        transform: open ? 'translateY(0) scale(1)' : 'translateY(-6px) scale(.98)',
+        pointerEvents: open ? 'all' : 'none',
+        zIndex: 300,
+        width,
+      }}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -156,23 +122,13 @@ export function Header() {
 
   return (
     <header
-      className="flex items-center shrink-0"
-      style={{
-        height: 'var(--header-h)',
-        background: 'var(--white)',
-        borderBottom: '1px solid var(--border)',
-        padding: '0 20px',
-        gap: '12px',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-      }}
+      className="flex items-center shrink-0 sticky top-0 z-[100] gap-3 px-5 bg-[var(--white)] border-b border-[var(--border)]"
+      style={{ height: 'var(--header-h)' }}
     >
       {/* Sidebar toggle */}
       <button
         onClick={isTablet ? toggleMobileOpen : toggleCollapsed}
-        className="flex items-center justify-center rounded-[var(--radius-sm)] transition-colors hover:bg-[var(--tag-bg)]"
-        style={{ width: '30px', height: '30px', flexShrink: 0, color: 'var(--txt-sec)' }}
+        className="flex items-center justify-center w-[30px] h-[30px] shrink-0 rounded-[var(--radius-sm)] text-[var(--txt-sec)] transition-colors hover:bg-[var(--tag-bg)]"
         title={t('header.toggleSidebar')}
       >
         {isTablet ? (
@@ -198,166 +154,118 @@ export function Header() {
       <Breadcrumb />
 
       {/* Global Search — hidden on mobile */}
-      <div className="hidden md:flex flex-1" style={{ minWidth: 0 }}>
+      <div className="hidden md:flex flex-1 min-w-0">
         <GlobalSearch />
       </div>
 
       {/* Right: header-actions */}
-      <div className="flex items-center gap-1.5" style={{ marginLeft: 'auto', flexShrink: 0 }}>
+      <div className="flex items-center gap-1.5 ml-auto shrink-0">
 
         {/* ── Notification Dropdown ── */}
-        <div ref={notifDD.ref} style={{ position: 'relative' }}>
+        <div ref={notifDD.ref} className="relative">
           <button
             onClick={notifDD.toggle}
-            style={{ ...dropdownBtnStyle, position: 'relative' }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#ccc'; e.currentTarget.style.background = 'var(--white)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg)'; }}
+            className="relative flex items-center gap-1.5 h-8 px-2.5 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--bg)] text-[var(--txt-sec)] text-[13px] cursor-pointer whitespace-nowrap transition-[border-color,background] duration-[150ms] hover:border-[var(--txt-muted)] hover:bg-[var(--white)]"
           >
             <Bell size={15} />
             <span
-              style={{
-                position: 'absolute', top: '-4px', right: '-4px',
-                width: '16px', height: '16px', borderRadius: '50%',
-                background: 'var(--danger)', color: '#fff',
-                fontFamily: 'var(--font-mono-custom)', fontSize: '9px', fontWeight: 700,
-                display: 'grid', placeItems: 'center',
-                border: '2px solid var(--white)',
-              }}
+              className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[var(--danger)] text-[var(--on-accent)] font-[var(--font-mono)] text-[9px] font-bold grid place-items-center border-2 border-[var(--white)]"
             >
               3
             </span>
           </button>
-          <div style={panelStyle(notifDD.open, '300px')}>
+          <DropdownPanel open={notifDD.open} width="300px">
             <div
-              className="flex items-center justify-between"
-              style={{ padding: '14px 16px 10px', borderBottom: '1px solid var(--border)' }}
+              className="flex items-center justify-between px-4 pt-3.5 pb-2.5 border-b border-[var(--border)]"
             >
-              <span style={{ fontFamily: 'var(--font-display-custom)', fontSize: '14px', fontWeight: 600 }}>{t('header.notifications')}</span>
-              <span style={{
-                background: 'var(--accent-light)', color: 'var(--accent)',
-                fontFamily: 'var(--font-mono-custom)', fontSize: '10px',
-                padding: '2px 7px', borderRadius: '10px',
-              }}>
+              <span className="font-[var(--font-display)] text-[14px] font-semibold">{t('header.notifications')}</span>
+              <span className="bg-[var(--accent-light)] text-[var(--accent)] font-[var(--font-mono)] text-[10px] px-[7px] py-0.5 rounded-[10px]">
                 {t('header.newCount', { count: 3 })}
               </span>
             </div>
-            <ul style={{ padding: '4px 0' }}>
+            <ul className="py-1">
               {[
                 { color: 'var(--accent)',  title: t('notifications.newUser'),     time: t('notifications.time2min') },
                 { color: 'var(--warn)',    title: t('notifications.orderUpdate'), time: t('notifications.time15min') },
                 { color: 'var(--success)', title: t('notifications.backupDone'),  time: t('notifications.time1hr') },
               ].map((n, i) => (
                 <li key={i}>
-                  {i > 0 && <div style={{ height: '1px', background: 'var(--border)', margin: '0 16px' }} />}
-                  <div
-                    className="flex items-start cursor-pointer transition-colors"
-                    style={{ gap: '10px', padding: '10px 16px' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--stripe)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                  >
+                  {i > 0 && <div className="h-px bg-[var(--border)] mx-4" />}
+                  <div className="flex items-start cursor-pointer gap-2.5 px-4 py-2.5 transition-colors hover:bg-[var(--stripe)]">
                     <span
-                      className="shrink-0"
-                      style={{ width: '8px', height: '8px', borderRadius: '50%', background: n.color, marginTop: '4px', display: 'block' }}
+                      className="shrink-0 block w-2 h-2 rounded-full mt-1"
+                      style={{ background: n.color }}
                     />
                     <div>
-                      <div style={{ fontSize: '13px', fontWeight: 500 }}>{n.title}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--txt-muted)', marginTop: '1px' }}>{n.time}</div>
+                      <div className="text-[13px] font-medium">{n.title}</div>
+                      <div className="text-[11px] text-[var(--txt-muted)] mt-px">{n.time}</div>
                     </div>
                   </div>
                 </li>
               ))}
             </ul>
             {/* Footer */}
-            <div style={{ borderTop: '1px solid var(--border)', padding: '10px 16px', textAlign: 'center' }}>
+            <div className="border-t border-[var(--border)] px-4 py-2.5 text-center">
               <button
                 onClick={() => notifDD.close()}
-                style={{
-                  fontSize: '12px', color: 'var(--accent)', fontWeight: 500,
-                  cursor: 'pointer', background: 'transparent', border: 'none',
-                  fontFamily: 'inherit',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.textDecoration = 'underline'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.textDecoration = 'none'; }}
+                className="text-[12px] text-[var(--accent)] font-medium cursor-pointer bg-transparent border-none hover:underline"
               >
                 {t('header.viewAll')}
               </button>
             </div>
-          </div>
+          </DropdownPanel>
         </div>
 
         {/* ── User Menu Dropdown ── */}
-        <div ref={userDD.ref} style={{ position: 'relative' }}>
+        <div ref={userDD.ref} className="relative">
           <button
             onClick={userDD.toggle}
-            style={{ ...dropdownBtnStyle, gap: '8px' }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#ccc'; e.currentTarget.style.background = 'var(--white)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--bg)'; }}
+            className="flex items-center gap-2 h-8 px-2.5 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--bg)] text-[var(--txt-sec)] text-[13px] cursor-pointer whitespace-nowrap transition-[border-color,background] duration-[150ms] hover:border-[var(--txt-muted)] hover:bg-[var(--white)]"
           >
             <div
-              style={{
-                width: '24px', height: '24px', borderRadius: '50%',
-                background: 'var(--accent)', display: 'grid', placeItems: 'center',
-                fontFamily: 'var(--font-mono-custom)', fontSize: '10px', color: '#fff', flexShrink: 0,
-              }}
+              className="w-6 h-6 rounded-full bg-[var(--accent)] grid place-items-center font-[var(--font-mono)] text-[10px] text-[var(--on-accent)] shrink-0"
             >
               {initials}
             </div>
-            <span style={{ fontWeight: 500 }}>{user?.name?.split(' ')[0]}</span>
-            <span style={{ fontSize: '10px', opacity: 0.6 }}>▾</span>
+            <span className="font-medium">{user?.name?.split(' ')[0]}</span>
+            <span className="text-[10px] opacity-60">▾</span>
           </button>
-          <div style={panelStyle(userDD.open, '220px')}>
+          <DropdownPanel open={userDD.open} width="220px">
             {/* User info header */}
-            <div
-              className="flex items-center"
-              style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', gap: '10px' }}
-            >
+            <div className="flex items-center gap-2.5 px-4 py-3 border-b border-[var(--border)]">
               <div
-                style={{
-                  width: '32px', height: '32px', borderRadius: '50%',
-                  background: 'var(--accent)', display: 'grid', placeItems: 'center',
-                  fontFamily: 'var(--font-mono-custom)', fontSize: '11px', color: '#fff', flexShrink: 0,
-                }}
+                className="w-8 h-8 rounded-full bg-[var(--accent)] grid place-items-center font-[var(--font-mono)] text-[11px] text-[var(--on-accent)] shrink-0"
               >
                 {initials}
               </div>
               <div>
-                <div style={{ fontSize: '13px', fontWeight: 600 }}>{user?.name}</div>
-                <div style={{ fontSize: '11px', color: 'var(--txt-muted)' }}>{user?.email}</div>
+                <div className="text-[13px] font-semibold">{user?.name}</div>
+                <div className="text-[11px] text-[var(--txt-muted)]">{user?.email}</div>
               </div>
             </div>
 
-            <ul style={{ padding: '6px 0' }}>
+            <ul className="py-1.5">
               <li>
-                <button
-                  style={menuItemStyle}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--stripe)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                >
-                  <span style={iconStyle}><User size={14} /></span> {t('header.profile')}
+                <button className="nx-menu-item">
+                  <span className="w-4 text-center opacity-60 shrink-0"><User size={14} /></span> {t('header.profile')}
                 </button>
               </li>
               <li>
-                <button
-                  style={menuItemStyle}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--stripe)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                >
-                  <span style={iconStyle}><Lock size={14} /></span> {t('header.changePassword')}
+                <button className="nx-menu-item">
+                  <span className="w-4 text-center opacity-60 shrink-0"><Lock size={14} /></span> {t('header.changePassword')}
                 </button>
               </li>
-              <div style={dividerStyle} />
+              <div className="nx-divider" />
 
               {/* Theme */}
               <li>
-                <div style={menuRowStyle}>
-                  <span style={iconStyle}><Sun size={14} /></span>
-                  <span style={{ color: 'var(--txt)', flexShrink: 0 }}>{t('header.theme')}</span>
+                <div className="nx-menu-row">
+                  <span className="w-4 text-center opacity-60 shrink-0"><Sun size={14} /></span>
+                  <span className="text-[var(--txt)] shrink-0">{t('header.theme')}</span>
                   <select
                     value={mode}
                     onChange={(e) => setMode(e.target.value as 'light' | 'dark' | 'system')}
-                    style={miniSelectStyle}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; }}
+                    className="nx-select-mini ml-auto"
                   >
                     <option value="system">{t('theme.system')}</option>
                     <option value="light">{t('theme.light')}</option>
@@ -368,15 +276,13 @@ export function Header() {
 
               {/* Language */}
               <li>
-                <div style={menuRowStyle}>
-                  <span style={iconStyle}><Globe size={14} /></span>
-                  <span style={{ color: 'var(--txt)', flexShrink: 0 }}>{t('header.language')}</span>
+                <div className="nx-menu-row">
+                  <span className="w-4 text-center opacity-60 shrink-0"><Globe size={14} /></span>
+                  <span className="text-[var(--txt)] shrink-0">{t('header.language')}</span>
                   <select
                     value={locale}
                     onChange={(e) => handleLocaleChange(e.target.value)}
-                    style={miniSelectStyle}
-                    onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; }}
-                    onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; }}
+                    className="nx-select-mini ml-auto"
                   >
                     {LOCALES.map((l) => (
                       <option key={l.value} value={l.value}>{l.label}</option>
@@ -385,19 +291,17 @@ export function Header() {
                 </div>
               </li>
 
-              <div style={dividerStyle} />
+              <div className="nx-divider" />
               <li>
                 <button
                   onClick={handleSignOut}
-                  style={{ ...menuItemStyle, color: 'var(--danger)' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--stripe)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                  className="nx-menu-item text-[var(--danger)]"
                 >
-                  <span style={iconStyle}><LogOut size={14} /></span> {t('header.signOut')}
+                  <span className="w-4 text-center opacity-60 shrink-0"><LogOut size={14} /></span> {t('header.signOut')}
                 </button>
               </li>
             </ul>
-          </div>
+          </DropdownPanel>
         </div>
       </div>
     </header>
