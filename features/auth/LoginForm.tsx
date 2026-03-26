@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { Label } from '@/components/ui/label';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import { apiFetch } from '@/lib/fetch';
 import { useAuthStore } from '@/store/authStore';
@@ -60,7 +59,7 @@ export function LoginForm() {
         <div className="flex items-center gap-2 mb-6">
           <div
             className="flex items-center justify-center rounded"
-            style={{ width: '32px', height: '32px', borderRadius: '6px', background: 'var(--accent)', color: '#fff', fontSize: '16px', fontWeight: 700 }}
+            style={{ width: '32px', height: '32px', borderRadius: '6px', background: 'var(--accent)', color: 'var(--on-accent)', fontSize: '16px', fontWeight: 700 }}
           >
             N
           </div>
@@ -78,23 +77,34 @@ export function LoginForm() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="email" style={{ fontSize: 'var(--text-sm)', color: 'var(--label-text)' }}>
+            <label htmlFor="email" style={{ fontSize: 'var(--text-sm)', color: 'var(--label-text)', fontWeight: 500 }}>
               {t('auth.email')}
-            </Label>
+            </label>
             <input
               id="email"
               type="email"
               placeholder="admin@nexus.com"
               {...register('email')}
               style={{
-                height: 'var(--input-height)', width: '100%', padding: '0 10px',
+                height: 'var(--input-height)',
+                width: '100%',
+                padding: '0 10px',
                 border: `1px solid ${errors.email ? 'var(--input-border-error)' : 'var(--input-border-default)'}`,
-                borderRadius: 'var(--input-radius)', background: 'var(--input-bg-default)',
-                color: 'var(--input-text-default)', fontSize: 'var(--text-sm)', fontFamily: 'inherit',
-                outline: 'none', transition: 'border-color .15s, box-shadow .15s',
+                borderRadius: 'var(--input-radius)',
+                fontSize: 'var(--text-sm)',
+                background: 'var(--input-bg-default)',
+                color: 'var(--input-text-default)',
+                outline: 'none',
+                transition: 'border-color .15s, box-shadow .15s',
               }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--input-border-focus)'; e.currentTarget.style.boxShadow = 'var(--input-ring-focus)'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = errors.email ? 'var(--input-border-error)' : 'var(--input-border-default)'; e.currentTarget.style.boxShadow = 'none'; }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--input-border-focus)';
+                e.currentTarget.style.boxShadow = 'var(--input-ring-focus)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = errors.email ? 'var(--input-border-error)' : 'var(--input-border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             />
             {errors.email && (
               <p style={{ fontSize: 'var(--text-xs)', color: 'var(--error-text)' }}>{errors.email.message}</p>
@@ -102,23 +112,34 @@ export function LoginForm() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="password" style={{ fontSize: 'var(--text-sm)', color: 'var(--label-text)' }}>
+            <label htmlFor="password" style={{ fontSize: 'var(--text-sm)', color: 'var(--label-text)', fontWeight: 500 }}>
               {t('auth.password')}
-            </Label>
+            </label>
             <input
               id="password"
               type="password"
               placeholder="••••••••"
               {...register('password')}
               style={{
-                height: 'var(--input-height)', width: '100%', padding: '0 10px',
+                height: 'var(--input-height)',
+                width: '100%',
+                padding: '0 10px',
                 border: `1px solid ${errors.password ? 'var(--input-border-error)' : 'var(--input-border-default)'}`,
-                borderRadius: 'var(--input-radius)', background: 'var(--input-bg-default)',
-                color: 'var(--input-text-default)', fontSize: 'var(--text-sm)', fontFamily: 'inherit',
-                outline: 'none', transition: 'border-color .15s, box-shadow .15s',
+                borderRadius: 'var(--input-radius)',
+                fontSize: 'var(--text-sm)',
+                background: 'var(--input-bg-default)',
+                color: 'var(--input-text-default)',
+                outline: 'none',
+                transition: 'border-color .15s, box-shadow .15s',
               }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--input-border-focus)'; e.currentTarget.style.boxShadow = 'var(--input-ring-focus)'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = errors.password ? 'var(--input-border-error)' : 'var(--input-border-default)'; e.currentTarget.style.boxShadow = 'none'; }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--input-border-focus)';
+                e.currentTarget.style.boxShadow = 'var(--input-ring-focus)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = errors.password ? 'var(--input-border-error)' : 'var(--input-border-default)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             />
             {errors.password && (
               <p style={{ fontSize: 'var(--text-xs)', color: 'var(--error-text)' }}>{errors.password.message}</p>

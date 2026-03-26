@@ -1,4 +1,9 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
+
 export function ChartsGrid() {
+  const t = useTranslations();
   const rows = [
     { label: 'Jan', value: 45 },
     { label: 'Feb', value: 62 },
@@ -17,7 +22,7 @@ export function ChartsGrid() {
         style={{ background: 'var(--white)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-1)' }}
       >
         <p style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--font-bold)', color: 'var(--txt)', marginBottom: '16px' }}>
-          User Registrations (2024)
+          {t('dashboard.userRegistrations')}
         </p>
         <div className="flex items-end gap-3" style={{ height: '120px' }}>
           {rows.map((row) => (
@@ -44,13 +49,13 @@ export function ChartsGrid() {
         style={{ background: 'var(--white)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-1)' }}
       >
         <p style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--font-bold)', color: 'var(--txt)', marginBottom: '16px' }}>
-          Role Distribution
+          {t('dashboard.roleDistribution')}
         </p>
         <div className="flex flex-col gap-3">
           {[
-            { label: 'Admin',  value: 15, color: 'var(--role-admin)' },
-            { label: 'Editor', value: 38, color: 'var(--role-editor)' },
-            { label: 'Viewer', value: 75, color: 'var(--inactive)' },
+            { label: t('roles.admin'),  value: 15, color: 'var(--role-admin)' },
+            { label: t('roles.editor'), value: 38, color: 'var(--role-editor)' },
+            { label: t('roles.viewer'), value: 75, color: 'var(--inactive)' },
           ].map(({ label, value, color }) => (
             <div key={label} className="flex items-center gap-3">
               <span style={{ width: '50px', fontSize: 'var(--text-sm)', color: 'var(--txt-sec)' }}>{label}</span>

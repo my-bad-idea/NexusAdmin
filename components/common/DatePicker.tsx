@@ -226,7 +226,7 @@ export function DatePicker({ value, onChange, placeholder, style, className }: D
                     border: cell.isToday && !isSelected ? '1px solid var(--accent)' : '1px solid transparent',
                     background: isSelected ? 'var(--accent)' : 'transparent',
                     color: isSelected
-                      ? '#fff'
+                      ? 'var(--on-accent)'
                       : cell.isCurrentMonth ? 'var(--txt)' : 'var(--txt-muted)',
                     opacity: cell.isCurrentMonth ? 1 : 0.4,
                     cursor: 'pointer',

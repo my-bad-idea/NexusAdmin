@@ -10,6 +10,7 @@ import {
   RowSelectionState,
 } from '@tanstack/react-table';
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { SkeletonTable } from './SkeletonTable';
 import { EmptyState } from './EmptyState';
@@ -74,6 +75,7 @@ export function DataTable<T extends { id: string }>({
   enableSorting = true,
   paginationResource,
 }: DataTableProps<T>) {
+  const t = useTranslations();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -297,12 +299,12 @@ export function DataTable<T extends { id: string }>({
               color: 'var(--txt-muted)',
             }}
           >
-            <div className="pagination-info max-[480px]:hidden">
-              Showing{' '}
+            <div className="pagination-info">
+              {t('datatable.showing')}{' '}
               <span style={{ fontFamily: 'var(--font-mono-custom)', fontWeight: 500, color: 'var(--txt-sec)' }}>
                 {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)}
               </span>{' '}
-              of{' '}
+              {t('datatable.of')}{' '}
               <span style={{ fontFamily: 'var(--font-mono-custom)', fontWeight: 500, color: 'var(--txt-sec)' }}>
                 {total}
               </span>
@@ -339,7 +341,7 @@ export function DataTable<T extends { id: string }>({
                       width: '24px', height: '24px',
                       border: `1px solid ${p === page ? 'var(--accent)' : 'var(--border)'}`,
                       background: p === page ? 'var(--accent)' : 'var(--bg)',
-                      color: p === page ? '#fff' : 'var(--txt-sec)',
+                      color: p === page ? 'var(--on-accent)' : 'var(--txt-sec)',
                       fontWeight: p === page ? 600 : 400,
                       cursor: 'pointer',
                       fontSize: '11.5px', fontFamily: 'var(--font-mono-custom)',
@@ -366,8 +368,8 @@ export function DataTable<T extends { id: string }>({
                 <ChevronRight size={12} />
               </button>
             </div>
-            <div className="hidden md:flex items-center gap-1.5">
-              <span style={{ fontSize: '11px', color: 'var(--txt-muted)' }}>Per page</span>
+            <div className="flex items-center gap-1.5">
+              <span style={{ fontSize: '11px', color: 'var(--txt-muted)' }}>{t('datatable.perPage')}</span>
               <select
                 value={pageSize}
                 onChange={(e) => {

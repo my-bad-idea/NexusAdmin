@@ -91,7 +91,9 @@
     "totalUsers": "总用户数",
     "totalRoles": "角色数量",
     "todayLogins": "今日登录",
-    "systemStatus": "系统状态"
+    "systemStatus": "系统状态",
+    "userRegistrations": "用户注册趋势（2024）",
+    "roleDistribution": "角色分布"
   },
   "auth": {
     "signIn": "登录",
@@ -141,19 +143,61 @@
     "keywordPlaceholder": "姓名、邮箱或 ID...",
     "tagsPlaceholder": "例如 标签..."
   },
+  "forbidden": {
+    "title": "403 — 禁止访问",
+    "description": "您没有权限访问此页面。"
+  },
+  "placeholder": {
+    "comingSoon": "即将推出"
+  },
   "confirm": {
     "cancel": "取消",
     "delete": "删除",
     "confirm": "确认",
-    "typeToConfirmBefore": "输入 ",
-    "typeToConfirmAfter": " 以确认：",
     "confirmWord": "确认",
-    "itemCount": "（{count} 项）",
-    "itemCountSingle": "（{count} 项）"
+    "itemCount": "{count} 项",
+    "typeToConfirm": "输入 <strong>{text}</strong> 以确认："
   },
   "datePicker": {
     "placeholder": "选择日期",
     "today": "今天",
     "clear": "清除"
+  },
+  "datatable": {
+    "showing": "显示",
+    "of": "共",
+    "perPage": "每页"
+  },
+  "roles": {
+    "admin": "管理员",
+    "editor": "编辑者",
+    "viewer": "查看者"
+  },
+  "empty": {
+    "defaultResource": "项目",
+    "emptyTitle": "暂无{resource}",
+    "emptyDesc": "开始创建您的第一个{resource}。",
+    "emptyAction": "添加{resource}",
+    "noResultsTitle": "未找到结果",
+    "noResultsDesc": "请尝试调整筛选条件。",
+    "noResultsDescKeyword": "未找到「{keyword}」的结果，请尝试其他搜索。",
+    "noResultsAction": "清除筛选",
+    "noPermissionTitle": "访问受限",
+    "noPermissionDesc": "您没有权限查看此内容。"
+  },
+  "enums": {
+    "dept": {
+      "engineering": "工程部",
+      "product": "产品部",
+      "design": "设计部",
+      "marketing": "市场部",
+      "sales": "销售部",
+      "hr": "人力资源"
+    },
+    "status": {
+      "active": "活跃",
+      "inactive": "未激活",
+      "suspended": "已停用"
+    }
   }
 }

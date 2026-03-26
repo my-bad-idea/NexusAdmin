@@ -16,7 +16,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import React from 'react';
 
-const AVATAR_COLORS = ['#6366f1', '#8b5cf6', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444'];
+const AVATAR_COLORS = [
+  'var(--avatar-1)', 'var(--avatar-2)', 'var(--avatar-3)',
+  'var(--avatar-4)', 'var(--avatar-5)', 'var(--avatar-6)',
+];
 
 function getAvatarColor(name: string) {
   let hash = 0;
@@ -105,7 +108,7 @@ export function createUserColumns(
             width: '26px', height: '26px', borderRadius: '50%', flexShrink: 0,
             display: 'grid', placeItems: 'center',
             background: getAvatarColor(row.original.name),
-            fontFamily: 'var(--font-mono-custom)', fontSize: '9.5px', fontWeight: 500, color: '#fff',
+            fontFamily: 'var(--font-mono-custom)', fontSize: '9.5px', fontWeight: 500, color: 'var(--on-accent)',
           }}>
             {row.original.name.slice(0, 2).toUpperCase()}
           </div>

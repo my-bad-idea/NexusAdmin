@@ -91,7 +91,9 @@
     "totalUsers": "Total Users",
     "totalRoles": "Total Roles",
     "todayLogins": "Today's Logins",
-    "systemStatus": "System Status"
+    "systemStatus": "System Status",
+    "userRegistrations": "User Registrations (2024)",
+    "roleDistribution": "Role Distribution"
   },
   "auth": {
     "signIn": "Sign in",
@@ -139,21 +141,63 @@
     "clearAll": "Clear All",
     "applyFilters": "Apply Filters",
     "keywordPlaceholder": "Name, email or ID...",
-    "tagsPlaceholder": "e.g. tags..."
+    "tagsPlaceholder": "e.g. Tags..."
+  },
+  "forbidden": {
+    "title": "403 — Access Forbidden",
+    "description": "You don't have permission to access this page."
+  },
+  "placeholder": {
+    "comingSoon": "Coming soon"
   },
   "confirm": {
     "cancel": "Cancel",
     "delete": "Delete",
     "confirm": "Confirm",
-    "typeToConfirmBefore": "Type ",
-    "typeToConfirmAfter": " to confirm:",
     "confirmWord": "confirm",
-    "itemCount": "({count} items)",
-    "itemCountSingle": "({count} item)"
+    "itemCount": "{count, plural, one {1 item} other {{count} items}}",
+    "typeToConfirm": "Type <strong>{text}</strong> to confirm:"
   },
   "datePicker": {
     "placeholder": "Select date",
     "today": "Today",
     "clear": "Clear"
+  },
+  "datatable": {
+    "showing": "Showing",
+    "of": "of",
+    "perPage": "Per page"
+  },
+  "roles": {
+    "admin": "Admin",
+    "editor": "Editor",
+    "viewer": "Viewer"
+  },
+  "empty": {
+    "defaultResource": "items",
+    "emptyTitle": "No {resource} yet",
+    "emptyDesc": "Get started by creating your first {resource}.",
+    "emptyAction": "Add {resource}",
+    "noResultsTitle": "No results found",
+    "noResultsDesc": "Try adjusting your filters.",
+    "noResultsDescKeyword": "No results for \"{keyword}\". Try a different search.",
+    "noResultsAction": "Clear filters",
+    "noPermissionTitle": "Access restricted",
+    "noPermissionDesc": "You don't have permission to view this content."
+  },
+  "enums": {
+    "dept": {
+      "engineering": "Engineering",
+      "product": "Product",
+      "design": "Design",
+      "marketing": "Marketing",
+      "sales": "Sales",
+      "hr": "HR"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended"
+    }
   }
 }

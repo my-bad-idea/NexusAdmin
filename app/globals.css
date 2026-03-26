@@ -43,6 +43,15 @@
   --accent-active: #4338ca;
   --accent-light:  #eef2ff;
   --accent-mid:    #c7d2fe;
+  --on-accent:     #ffffff;
+
+  /* Avatar Colors */
+  --avatar-1: #6366f1;
+  --avatar-2: #8b5cf6;
+  --avatar-3: #0ea5e9;
+  --avatar-4: #10b981;
+  --avatar-5: #f59e0b;
+  --avatar-6: #ef4444;
 
   /* Role Badges */
   --badge-bg:    #ffffff;
@@ -223,6 +232,13 @@
   --accent:        #818cf8;
   --accent-hover:  #6366f1;
   --accent-light:  #1e2356;
+  --on-accent:     #ffffff;
+  --avatar-1: #818cf8;
+  --avatar-2: #a78bfa;
+  --avatar-3: #38bdf8;
+  --avatar-4: #34d399;
+  --avatar-5: #fbbf24;
+  --avatar-6: #f87171;
   --btn-delete:     #f87171;
   --btn-delete-bg:  #7f1d1d;
   --btn-disable:    #fbbf24;

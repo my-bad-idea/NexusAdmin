@@ -12,8 +12,8 @@ Zustand · TanStack Query v5 · next-intl · MSW v2 · Vitest · TypeScript 5.6
 
 **样式**
 - 禁止 Tailwind 颜色类：`bg-blue-*` `text-gray-*` `border-red-*`
-- 禁止 `features/` `app/` 中直接写 `var(--*)` 或硬编码色值
-- 颜色只能用封装组件 或 `bg-[var(--accent)]` 任意值形式
+- 禁止硬编码色值（hex/rgb/hsl），`style` 属性中允许 `var(--*)`
+- `className` 中优先使用 Tailwind 任意值形式 `bg-[var(--accent)]`，封装组件仍为首选
 
 **状态**
 - Zustand 禁止存服务端数据（list / items / rows / records 键名）
@@ -30,7 +30,7 @@ Zustand · TanStack Query v5 · next-intl · MSW v2 · Vitest · TypeScript 5.6
 - 无权限按钮必须 `return null`，禁止用 `disabled` 代替
 
 **Header / FilterBar / 表单**
-- Header 下拉菜单使用自定义 Dropdown（`useDropdown` hook），禁止使用 shadcn DropdownMenu
+- Header 下拉菜单（通知、用户菜单）使用自定义 Dropdown（`useDropdown` hook），禁止使用 shadcn DropdownMenu。表格行操作菜单可使用 shadcn DropdownMenu
 - FilterBar 搜索框/下拉/日期使用原生 HTML 元素（`<input>` / `<select>`），禁止 shadcn Input / Select
 - 表单（UserForm / ConfirmDialog 等）使用原生 `<input>` / `<select>`，禁止 shadcn Input / Select
 - 所有弹框遮罩层使用透明背景（`bg-transparent`），不遮挡底层内容

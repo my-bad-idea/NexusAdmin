@@ -135,6 +135,7 @@ export function useList<T>({ queryKey, queryFn, defaultPageSize = 20 }) {
 
   return { ...query, filters, page, pageSize, setFilter,
            setPage: (n: number) => { const p = new URLSearchParams(searchParams); p.set('page', String(n)); router.replace(`?${p}`); },
+           setPageSize: (n: number) => { const p = new URLSearchParams(searchParams); p.set('size', String(n)); p.set('page', '1'); router.replace(`?${p}`); },
            resetFilters: () => router.replace('?') };
 }
 ```
@@ -183,25 +184,36 @@ export function useFormError<T extends FieldValues>(setError: UseFormSetError<T>
 ### useListPage — 列表页全套封装
 ```typescript
 // hooks/templates/useListPage.ts
+interface UseListPageOptions<T extends { id: string }> {
+  resource:    string;
+  queryFn:     (params: ListParams) => Promise<PageData<T>>;
+  deleteFn?:   (id: string) => Promise<void>;
+  permPrefix?: string;
+}
+
 export function useListPage<T extends { id: string }>({
-  resource, queryFn, deleteFn, batchFns = {}, permPrefix,
+  resource, queryFn, deleteFn, permPrefix,
 }) {
   const list      = useList({ queryKey: [resource], queryFn });
-  const canWrite  = permPrefix ? usePermission(`${permPrefix}:write`)  : true;
-  const canDelete = permPrefix ? usePermission(`${permPrefix}:delete`) : true;
-  const canExport = permPrefix ? usePermission(`${permPrefix}:export`) : false;
+  const canWrite  = usePermission(permPrefix ? `${permPrefix}:write`  : '');
+  const canDelete = usePermission(permPrefix ? `${permPrefix}:delete` : '');
+  const canExport = usePermission(permPrefix ? `${permPrefix}:export` : '');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [viewMode, setViewMode] = useTableViewMode(resource);
 
-  const deleteAction = deleteFn ? useAction({
-    mutationFn: deleteFn,
-    invalidateKeys: [[resource]],
-    successMessage: `${resource} deleted`,
-  }) : null;
+  const deleteAction = deleteFn
+    ? useAction<void, string>({
+        mutationFn: deleteFn,
+        invalidateKeys: [[resource]],
+        successMessage: `${resource} deleted`,
+      })
+    : null;
 
   return {
     ...list,
-    canWrite, canDelete, canExport,
+    canWrite:  permPrefix ? canWrite  : true,
+    canDelete: permPrefix ? canDelete : true,
+    canExport: permPrefix ? canExport : false,
     selectedIds, setSelectedIds,
     deleteAction, viewMode, setViewMode,
   };
@@ -247,7 +259,60 @@ return (
 
 ---
 
-## 六、CRUD 刷新约定
+## 六、useGlobalSearch — 全局搜索 Hook
+
+```typescript
+// hooks/useGlobalSearch.ts
+export type SearchResultItem =
+  | { type: 'page'; data: SearchablePage }
+  | { type: 'user'; data: UserProfile };
+
+export interface GlobalSearchResult {
+  query: string;
+  setQuery: (q: string) => void;
+  isOpen: boolean;
+  open: () => void;
+  close: () => void;
+  ref: React.RefObject<HTMLDivElement | null>;
+  flatItems: SearchResultItem[];
+  pages: SearchablePage[];              // 静态页面匹配（query >= 1 字符）
+  users: UserProfile[];                 // API 用户搜索（query >= 2 字符，防抖 300ms）
+  isLoadingUsers: boolean;
+  activeIndex: number;                  // 键盘导航当前选中索引
+  onKeyDown: (e: React.KeyboardEvent) => void;
+  navigate: (item: SearchResultItem) => void;
+}
+
+export function useGlobalSearch(): GlobalSearchResult
+// 查询键：queryKeys.search.users(q)，staleTime: 30s，placeholderData: keepPreviousData
+// Pages 跳转：直接路径（/dashboard, /users），无 locale 前缀
+// Users 跳转：/users?keyword={name}
+```
+
+---
+
+## 七、date-picker-helpers — 日期选择辅助函数
+
+```typescript
+// components/common/date-picker-helpers.ts
+interface CalendarDay {
+  day: number;
+  iso: string;            // 'YYYY-MM-DD'
+  isCurrentMonth: boolean;
+  isToday: boolean;
+}
+
+getWeekStartDay(locale: string): 0 | 1          // en → 0(周日), 其他 → 1(周一)
+getCalendarDays(year, month, weekStartsOn): CalendarDay[]  // 42 格日历
+formatMonthYear(year, month, locale): string     // Intl 格式化月份标题
+getWeekdayNames(locale, weekStartsOn): string[]  // Intl 格式化星期名
+formatDisplayDate(iso, locale): string           // ISO → 本地化日期显示
+parseIsoDate(iso): { year, month } | null        // ISO → 年月解析
+```
+
+---
+
+## 八、CRUD 刷新约定
 
 ```typescript
 // ✅ 正确：invalidate 触发重新 fetch

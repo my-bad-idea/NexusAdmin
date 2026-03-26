@@ -81,4 +81,17 @@ export const usersHandlers = [
       message: `${succeeded.length} of ${ids.length} users disabled`,
     });
   }),
+
+  http.post('/api/users/batch-delete', async ({ request }) => {
+    const { ids } = await request.json() as { ids: string[] };
+    ids.forEach((id) => {
+      const idx = MOCK_USERS.findIndex((u) => u.id === id);
+      if (idx !== -1) MOCK_USERS.splice(idx, 1);
+    });
+    return HttpResponse.json({
+      code: 0,
+      data: null,
+      message: `${ids.length} users deleted`,
+    });
+  }),
 ];

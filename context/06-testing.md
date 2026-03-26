@@ -25,18 +25,19 @@
 ## 二、单测目录与覆盖要求
 
 ```
-__tests__/
+tests/unit/                                      # 实际目录路径
 ├── hooks/
-│   └── usePermission.test.ts      # 🔴 P0，100% 覆盖
+│   └── usePermission.test.ts      # 🔴 P0，100% 覆盖 ✅ 已实现
 ├── components/
-│   ├── DataTable.test.tsx         # P1：渲染/分页/选中/空态
-│   ├── UserForm.test.tsx          # P1：校验/提交/错误映射
-│   └── AdvancedFilter.test.tsx    # P1：筛选条件计数
+│   ├── ConfirmDialog.test.tsx     # P1：渲染/确认/取消    ✅ 已实现
+│   ├── DataTable.test.tsx         # P1：渲染/分页/选中/空态  ⬜ 待实现
+│   ├── UserForm.test.tsx          # P1：校验/提交/错误映射  ⬜ 待实现
+│   └── AdvancedFilter.test.tsx    # P1：筛选条件计数       ⬜ 待实现
 ├── store/
-│   ├── authStore.test.ts          # P1：setAuth/clearAuth
-│   └── themeStore.test.ts         # P1：切换主题
+│   ├── authStore.test.ts          # P1：setAuth/clearAuth  ✅ 已实现
+│   └── themeStore.test.ts         # P1：切换主题           ✅ 已实现
 └── queries/
-    └── usersQuery.test.ts         # P2：TanStack Query mock
+    └── usersQuery.test.ts         # P2：TanStack Query mock ⬜ 待实现
 ```
 
 | 目标 | 覆盖率 | 优先级 |
@@ -62,23 +63,21 @@ export default defineConfig({
 ## 三、E2E 目录结构（Playwright）
 
 ```
-e2e/
+tests/e2e/                                        # 实际目录路径
 ├── auth/
-│   ├── login-jwt.spec.ts          # 🔴 P0 MVP
-│   └── auth-guard.spec.ts         # 🔴 P0 MVP
+│   └── login.spec.ts              # 🔴 P0 MVP    ✅ 已实现（合并 login-jwt + auth-guard）
 ├── permission/
-│   ├── route-guard.spec.ts        # 🔴 P0 MVP
-│   └── button-permission.spec.ts  # 🔴 P0 MVP
+│   ├── route-guard.spec.ts        # 🔴 P0 MVP    ⬜ 待实现
+│   └── button-permission.spec.ts  # 🔴 P0 MVP    ⬜ 待实现
 ├── users/
-│   ├── list-filter.spec.ts        # 🔴 P0 MVP
-│   ├── create-user.spec.ts        # 🔴 P0 MVP
-│   ├── batch-delete.spec.ts       # 🟡 P1 Sprint
-│   └── advanced-filter.spec.ts   # 🟡 P1 Sprint
+│   ├── list.spec.ts               # 🔴 P0 MVP    ✅ 已实现（合并 list-filter + create-user）
+│   ├── batch-delete.spec.ts       # 🟡 P1 Sprint ⬜ 待实现
+│   └── advanced-filter.spec.ts   # 🟡 P1 Sprint  ⬜ 待实现
 ├── theme/
-│   └── theme-switch.spec.ts       # 🟡 P1 Sprint
+│   └── theme-switch.spec.ts       # 🟡 P1 Sprint ⬜ 待实现
 └── i18n/
-    ├── lang-switch.spec.ts        # 🟡 P1 Sprint
-    └── date-format.spec.ts       # 🟢 P2 扩展
+    ├── lang-switch.spec.ts        # 🟡 P1 Sprint ⬜ 待实现
+    └── date-format.spec.ts       # 🟢 P2 扩展    ⬜ 待实现
 ```
 
 ---
@@ -123,7 +122,7 @@ import { loginAs } from '../fixtures/auth';
 
 test('batch delete with partial failure', async ({ page }) => {
   await loginAs(page, 'admin');
-  await page.goto('/en/users');
+  await page.goto('/users');  // localePrefix: 'never'，URL 无 locale 前缀
 
   // 选中 3 行
   for (let i = 1; i <= 3; i++) {
@@ -157,6 +156,6 @@ test('batch delete with partial failure', async ({ page }) => {
 
 # package.json scripts
 "test":          "vitest run --coverage",
-"test:e2e:mvp":  "playwright test e2e/auth e2e/permission e2e/users/list-filter e2e/users/create-user",
+"test:e2e:mvp":  "playwright test tests/e2e/auth tests/e2e/permission tests/e2e/users/list",
 "ci":            "pnpm lint && pnpm type-check && pnpm test && pnpm test:e2e:mvp"
 ```
