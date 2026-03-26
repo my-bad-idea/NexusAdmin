@@ -27,23 +27,21 @@ export function useListPage<T extends { id: string }>({
   permPrefix,
 }: UseListPageOptions<T>) {
   const list = useList<PageData<T>>({ queryKey: [resource] as const, queryFn });
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const canWrite  = permPrefix ? usePermission(`${permPrefix}:write`)  : true;
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const canDelete = permPrefix ? usePermission(`${permPrefix}:delete`) : true;
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const canExport = permPrefix ? usePermission(`${permPrefix}:export`) : false;
+  const _canWrite  = usePermission(permPrefix ? `${permPrefix}:write`  : '');
+  const _canDelete = usePermission(permPrefix ? `${permPrefix}:delete` : '');
+  const _canExport = usePermission(permPrefix ? `${permPrefix}:export` : '');
+  const canWrite  = permPrefix ? _canWrite  : true;
+  const canDelete = permPrefix ? _canDelete : true;
+  const canExport = permPrefix ? _canExport : false;
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [viewMode, setViewMode] = useTableViewMode(resource);
 
-  const deleteAction = deleteFn
-    ? // eslint-disable-next-line react-hooks/rules-of-hooks
-      useAction<void, string>({
-        mutationFn: deleteFn,
-        invalidateKeys: [[resource]],
-        successMessage: `${resource} deleted`,
-      })
-    : null;
+  const _deleteAction = useAction<void, string>({
+    mutationFn: deleteFn ?? (() => Promise.resolve()),
+    invalidateKeys: [[resource]],
+    successMessage: `${resource} deleted`,
+  });
+  const deleteAction = deleteFn ? _deleteAction : null;
 
   return {
     ...list,

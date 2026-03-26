@@ -23,7 +23,7 @@ describe('ConfirmDialog', () => {
     render(
       <ConfirmDialog open type="info" title="T" description="D" onConfirm={async () => {}} onCancel={onCancel} />
     );
-    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+    fireEvent.click(screen.getByRole('button', { name: /confirm\.cancel/ }));
     expect(onCancel).toHaveBeenCalledOnce();
   });
 
@@ -38,7 +38,7 @@ describe('ConfirmDialog', () => {
     render(
       <ConfirmDialog open type="danger" title="Delete" description="Permanent" confirmText="confirm" onConfirm={async () => {}} onCancel={() => {}} />
     );
-    const deleteBtn = screen.getByRole('button', { name: /delete/i });
+    const deleteBtn = screen.getByRole('button', { name: /confirm\.delete/ });
     expect(deleteBtn).toBeDisabled();
 
     const input = screen.getByPlaceholderText('confirm');
@@ -51,7 +51,7 @@ describe('ConfirmDialog', () => {
     render(
       <ConfirmDialog open type="info" title="T" description="D" onConfirm={onConfirm} onCancel={() => {}} />
     );
-    fireEvent.click(screen.getByRole('button', { name: /confirm/i }));
+    fireEvent.click(screen.getByRole('button', { name: /confirm\.confirm/ }));
     await waitFor(() => expect(onConfirm).toHaveBeenCalledOnce());
   });
 });

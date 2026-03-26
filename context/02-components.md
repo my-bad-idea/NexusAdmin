@@ -32,7 +32,7 @@ interface DataTableProps<T extends { id: string }> {
   striped?:               boolean;                // true
   enableSorting?:         boolean;                // true
   enableColumnVisibility?: boolean;               // false
-  mobileView?:            'auto' | 'table' | 'card'; // auto
+  mobileView?:            'auto' | 'table' | 'card'; // auto（未实现，计划 v2）
 
   // ── P2 增强（按需启用）──────────────────────────────
   enableRowVirtualization?: boolean;  // 500+ 行
@@ -121,6 +121,7 @@ interface ConfirmDialogProps {
   title:       string;
   description: string;
   count?:      number;          // 受影响条数
+  confirmText?: string;         // 危险操作需输入的确认文本（默认 'confirm'）
   onConfirm:   () => Promise<void>;
   onCancel:    () => void;
 }
@@ -143,15 +144,17 @@ interface FilterFieldConfig {
   type:     'text' | 'select' | 'date-range' | 'checkbox-group' | 'date-preset';
   options?: { label: string; value: string }[];
   presets?: { label: string; value: string }[];
+  halfRow?: boolean; // 连续 halfRow 字段会合并为两列一行
 }
 
 interface AdvancedFilterProps {
   open:     boolean;
   onClose:  () => void;
   fields:   FilterFieldConfig[];
+  /** 当前 URL params 值 — 打开时用于初始化内部 draft */
   value:    Record<string, unknown>;
-  onChange: (value: Record<string, unknown>) => void;
-  onApply:  () => void;
+  onChange?: (value: Record<string, unknown>) => void;
+  onApply:  (values: Record<string, unknown>) => void;
   onReset:  () => void;
 }
 // 从右侧滑入，宽 360px（实际实现值，admin.html 对齐）

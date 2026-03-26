@@ -38,17 +38,18 @@ export function ConfirmDialog({
   title,
   description,
   count,
-  confirmText = 'confirm',
+  confirmText,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
   const t = useTranslations();
+  const resolvedConfirmText = confirmText ?? t('confirm.confirmWord');
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const { Icon, color, bg } = ICON_MAP[type];
 
   const isDanger = type === 'danger';
-  const canConfirm = !isDanger || input.toLowerCase() === confirmText.toLowerCase();
+  const canConfirm = !isDanger || input.toLowerCase() === resolvedConfirmText.toLowerCase();
 
   const handleConfirm = async () => {
     setLoading(true);
@@ -91,7 +92,7 @@ export function ConfirmDialog({
                 {description}
                 {count !== undefined && (
                   <span style={{ fontWeight: 'var(--font-medium)', color: 'var(--txt-sec)' }}>
-                    {' '}({count} item{count !== 1 ? 's' : ''})
+                    {' '}({t('confirm.itemCount', { count })})
                   </span>
                 )}
               </DialogDescription>
@@ -102,13 +103,16 @@ export function ConfirmDialog({
         {isDanger && (
           <div className="mt-2">
             <p style={{ fontSize: 'var(--text-sm)', color: 'var(--txt-sec)', marginBottom: '6px' }}>
-              Type <strong style={{ color: 'var(--danger)' }}>{confirmText}</strong> to confirm:
+              {t.rich('confirm.typeToConfirm', {
+                text: resolvedConfirmText,
+                strong: (chunks) => <strong style={{ color: 'var(--danger)' }}>{chunks}</strong>,
+              })}
             </p>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={confirmText}
+              placeholder={resolvedConfirmText}
               style={{
                 height: 'var(--input-height)',
                 width: '100%',
@@ -145,7 +149,7 @@ export function ConfirmDialog({
             <PrimaryButton
               onClick={handleConfirm}
               loading={loading}
-              style={{ background: 'var(--warn)', color: '#fff' } as React.CSSProperties}
+              style={{ background: 'var(--warn)', color: 'var(--on-accent)' } as React.CSSProperties}
             >
               {t('confirm.confirm')}
             </PrimaryButton>

@@ -4,7 +4,7 @@ import { loginAs } from '../fixtures/auth';
 test.describe('User Management', () => {
   test.beforeEach(async ({ page }) => {
     await loginAs(page, 'admin');
-    await page.goto('/zh-CN/users');
+    await page.goto('/users');
   });
 
   test('displays user list', async ({ page }) => {
@@ -23,7 +23,7 @@ test.describe('User Management', () => {
 
   test('delete button hidden for viewer', async ({ page }) => {
     await loginAs(page, 'viewer');
-    await page.goto('/zh-CN/users');
+    await page.goto('/users');
     await expect(page.getByRole('button', { name: /delete/i }).first()).not.toBeVisible({ timeout: 3000 });
   });
 });

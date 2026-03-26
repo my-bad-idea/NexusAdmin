@@ -1,16 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useMenuStore } from '@/store/menuStore';
 import { useRouter, usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, Users, List, Settings,
-  Shield, FolderOpen, Package, BarChart3, ChevronDown,
+  Shield, FolderOpen, Package, BarChart3, ChevronDown, X,
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { usePermission } from '@/hooks/usePermission';
+import { useIsTablet } from '@/hooks/useMediaQuery';
 
 const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
   LayoutDashboard,
@@ -208,60 +209,109 @@ function SubNavItem({ item }: { item: NavItem }) {
 
 export function Sidebar() {
   const collapsed = useMenuStore((s) => s.collapsed);
+  const mobileOpen = useMenuStore((s) => s.mobileOpen);
+  const setMobileOpen = useMenuStore((s) => s.setMobileOpen);
+  const isTablet = useIsTablet();
+  const pathname = usePathname();
+
+  // Auto-close drawer on navigation (only on pathname change, not initial mount)
+  const prevPathname = useRef(pathname);
+  useEffect(() => {
+    if (prevPathname.current !== pathname) {
+      prevPathname.current = pathname;
+      if (isTablet) setMobileOpen(false);
+    }
+  }, [pathname, isTablet, setMobileOpen]);
+
+  // Escape key to close drawer
+  useEffect(() => {
+    if (!isTablet || !mobileOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileOpen(false);
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isTablet, mobileOpen, setMobileOpen]);
+
+  // In tablet/mobile mode, always show expanded (ignore collapsed)
+  const showCollapsed = !isTablet && collapsed;
 
   return (
-    <aside
-      className="flex flex-col shrink-0 transition-[width] overflow-hidden"
-      style={{
-        width: collapsed ? 'var(--sidebar-collapsed-w)' : 'var(--sidebar-w)',
-        background: 'var(--sidebar-bg)',
-        height: '100vh',
-        position: 'sticky',
-        top: 0,
-        transitionDuration: '220ms',
-        transitionTimingFunction: 'cubic-bezier(.4,0,.2,1)',
-      }}
-    >
-      {/* Logo */}
-      <div
-        className="flex items-center shrink-0 overflow-hidden"
+    <>
+      {/* Overlay — tablet drawer mode only */}
+      {isTablet && mobileOpen && (
+        <div
+          className="fixed inset-0 z-[199] bg-transparent"
+          style={{ backdropFilter: 'blur(2px)' }}
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      <aside
+        className="flex flex-col shrink-0 overflow-hidden"
         style={{
-          height: 'var(--header-h)',
-          padding: collapsed ? '0' : '0 18px',
-          justifyContent: collapsed ? 'center' : undefined,
-          borderBottom: '1px solid var(--border-dark)',
+          width: isTablet ? '220px' : (collapsed ? 'var(--sidebar-collapsed-w)' : 'var(--sidebar-w)'),
+          background: 'var(--sidebar-bg)',
+          height: '100vh',
+          position: isTablet ? 'fixed' : 'sticky',
+          top: 0,
+          left: 0,
+          zIndex: isTablet ? 200 : undefined,
+          transform: isTablet ? (mobileOpen ? 'translateX(0)' : 'translateX(-220px)') : undefined,
+          transition: isTablet ? 'transform 220ms cubic-bezier(.4,0,.2,1)' : 'width 220ms cubic-bezier(.4,0,.2,1)',
         }}
       >
+        {/* Logo */}
         <div
-          className="flex items-center justify-center shrink-0"
-          style={{ width: '26px', height: '26px', borderRadius: '6px', background: 'var(--accent)', color: '#fff', fontSize: '14px', fontWeight: 700 }}
+          className="flex items-center shrink-0 overflow-hidden"
+          style={{
+            height: 'var(--header-h)',
+            padding: showCollapsed ? '0' : '0 18px',
+            justifyContent: showCollapsed ? 'center' : undefined,
+            borderBottom: '1px solid var(--border-dark)',
+          }}
         >
-          N
-        </div>
-        {!collapsed && (
-          <span className="ml-2 truncate" style={{ fontSize: '16px', fontWeight: 700, color: '#fff' }}>
-            NexusAdmin
-          </span>
-        )}
-      </div>
-
-      {/* Nav */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden py-2">
-        <div className="px-2 flex flex-col gap-0.5">
-          {STATIC_MENU.map((item) => (
-            <NavItemComponent key={item.id} item={item} collapsed={collapsed} />
-          ))}
-        </div>
-      </nav>
-
-      {/* Footer — version only, logout is in Header UserDropdown */}
-      {!collapsed && (
-        <div className="shrink-0" style={{ borderTop: '1px solid var(--border-dark)', padding: '10px 18px 8px' }}>
-          <div style={{ fontFamily: 'monospace', fontSize: '10px', color: '#334155', letterSpacing: '.04em' }}>
-            NexusAdmin v1.0.0
+          <div
+            className="flex items-center justify-center shrink-0"
+            style={{ width: '26px', height: '26px', borderRadius: '6px', background: 'var(--accent)', color: '#fff', fontSize: '14px', fontWeight: 700 }}
+          >
+            N
           </div>
+          {!showCollapsed && (
+            <span className="ml-2 truncate" style={{ fontSize: '16px', fontWeight: 700, color: '#fff' }}>
+              NexusAdmin
+            </span>
+          )}
+          {/* Close button — tablet drawer only */}
+          {isTablet && (
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="ml-auto flex items-center justify-center shrink-0 rounded-[var(--radius-sm)] transition-colors hover:bg-[rgba(255,255,255,.1)]"
+              style={{ width: '28px', height: '28px', color: 'var(--nav-item-text)', border: 'none', background: 'transparent', cursor: 'pointer' }}
+            >
+              <X size={16} />
+            </button>
+          )}
         </div>
-      )}
-    </aside>
+
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden py-2">
+          <div className="px-2 flex flex-col gap-0.5">
+            {STATIC_MENU.map((item) => (
+              <NavItemComponent key={item.id} item={item} collapsed={showCollapsed} />
+            ))}
+          </div>
+        </nav>
+
+        {/* Footer — version only, logout is in Header UserDropdown */}
+        {!showCollapsed && (
+          <div className="shrink-0" style={{ borderTop: '1px solid var(--border-dark)', padding: '10px 18px 8px' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: '10px', color: '#334155', letterSpacing: '.04em' }}>
+              NexusAdmin v1.0.0
+            </div>
+          </div>
+        )}
+      </aside>
+    </>
   );
 }

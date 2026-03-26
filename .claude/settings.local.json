@@ -18,7 +18,13 @@
       "Bash(npm run:*)",
       "Bash(grep -E \"\\\\.tsx$\")",
       "Bash(npx next:*)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx vitest:*)",
+      "Bash(python -c \":*)",
+      "Bash(node -e \"JSON.parse\\(require\\(''fs''\\).readFileSync\\(''i18n/messages/zh-CN.json'', ''utf8''\\)\\); console.log\\(''valid''\\)\")",
+      "Bash(for f:*)",
+      "Bash(do node:*)",
+      "Bash(done)"
     ]
   }
 }

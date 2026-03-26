@@ -5,9 +5,10 @@ import { useThemeStore } from '@/store/themeStore';
 import { useMenuStore } from '@/store/menuStore';
 import { usePathname, useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { User, Bell, Globe, LogOut, Lock, Sun } from 'lucide-react';
+import { User, Bell, Globe, LogOut, Lock, Sun, Menu } from 'lucide-react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { GlobalSearch } from '@/components/common/GlobalSearch';
+import { useIsTablet } from '@/hooks/useMediaQuery';
 
 const PATH_LABELS: Record<string, { parentKey?: string; currentKey: string }> = {
   dashboard: { currentKey: 'breadcrumb.dashboard' },
@@ -113,8 +114,8 @@ function Breadcrumb() {
   if (info.parentKey) {
     return (
       <nav className="flex items-center gap-1.5 shrink-0" style={{ fontSize: '13px', color: 'var(--txt-muted)' }}>
-        <span>{t(info.parentKey)}</span>
-        <span style={{ color: 'var(--border)' }}>/</span>
+        <span className="hidden md:inline">{t(info.parentKey)}</span>
+        <span className="hidden md:inline" style={{ color: 'var(--border)' }}>/</span>
         <span style={{ color: 'var(--txt)', fontWeight: 500 }}>{t(info.currentKey)}</span>
       </nav>
     );
@@ -132,7 +133,8 @@ export function Header() {
   const user = useAuthStore((s) => s.user);
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const { mode, setMode } = useThemeStore();
-  const { collapsed, toggleCollapsed } = useMenuStore();
+  const { collapsed, toggleCollapsed, toggleMobileOpen } = useMenuStore();
+  const isTablet = useIsTablet();
   const locale = useLocale();
   const router = useRouter();
   const t = useTranslations();
@@ -168,12 +170,14 @@ export function Header() {
     >
       {/* Sidebar toggle */}
       <button
-        onClick={toggleCollapsed}
+        onClick={isTablet ? toggleMobileOpen : toggleCollapsed}
         className="flex items-center justify-center rounded-[var(--radius-sm)] transition-colors hover:bg-[var(--tag-bg)]"
         style={{ width: '30px', height: '30px', flexShrink: 0, color: 'var(--txt-sec)' }}
         title={t('header.toggleSidebar')}
       >
-        {collapsed ? (
+        {isTablet ? (
+          <Menu size={16} />
+        ) : collapsed ? (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <line x1="3" y1="6" x2="21" y2="6"/>
             <line x1="3" y1="12" x2="15" y2="12"/>
@@ -193,8 +197,10 @@ export function Header() {
       {/* Breadcrumb */}
       <Breadcrumb />
 
-      {/* Global Search */}
-      <GlobalSearch />
+      {/* Global Search — hidden on mobile */}
+      <div className="hidden md:flex flex-1" style={{ minWidth: 0 }}>
+        <GlobalSearch />
+      </div>
 
       {/* Right: header-actions */}
       <div className="flex items-center gap-1.5" style={{ marginLeft: 'auto', flexShrink: 0 }}>

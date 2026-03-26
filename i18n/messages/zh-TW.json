@@ -91,7 +91,9 @@
     "totalUsers": "總使用者數",
     "totalRoles": "角色數量",
     "todayLogins": "今日登入",
-    "systemStatus": "系統狀態"
+    "systemStatus": "系統狀態",
+    "userRegistrations": "使用者註冊趨勢（2024）",
+    "roleDistribution": "角色分佈"
   },
   "auth": {
     "signIn": "登入",
@@ -133,16 +135,69 @@
     "write": "寫入",
     "deletePermission": "刪除",
     "adminAccess": "管理員權限",
-    "tags": "標籤"
+    "tags": "標籤",
+    "title": "進階篩選",
+    "activeFilters": "已啟用篩選",
+    "clearAll": "全部重設",
+    "applyFilters": "套用篩選",
+    "keywordPlaceholder": "姓名、信箱或 ID...",
+    "tagsPlaceholder": "例如 標籤..."
+  },
+  "forbidden": {
+    "title": "403 — 禁止存取",
+    "description": "您沒有權限存取此頁面。"
+  },
+  "placeholder": {
+    "comingSoon": "即將推出"
   },
   "confirm": {
     "cancel": "取消",
     "delete": "刪除",
-    "confirm": "確認"
+    "confirm": "確認",
+    "confirmWord": "確認",
+    "itemCount": "{count} 項",
+    "typeToConfirm": "輸入 <strong>{text}</strong> 以確認："
   },
   "datePicker": {
     "placeholder": "選擇日期",
     "today": "今天",
     "clear": "清除"
+  },
+  "datatable": {
+    "showing": "顯示",
+    "of": "共",
+    "perPage": "每頁"
+  },
+  "roles": {
+    "admin": "管理員",
+    "editor": "編輯者",
+    "viewer": "檢視者"
+  },
+  "empty": {
+    "defaultResource": "項目",
+    "emptyTitle": "暫無{resource}",
+    "emptyDesc": "開始建立您的第一個{resource}。",
+    "emptyAction": "新增{resource}",
+    "noResultsTitle": "未找到結果",
+    "noResultsDesc": "請嘗試調整篩選條件。",
+    "noResultsDescKeyword": "未找到「{keyword}」的結果，請嘗試其他搜尋。",
+    "noResultsAction": "清除篩選",
+    "noPermissionTitle": "存取受限",
+    "noPermissionDesc": "您沒有權限檢視此內容。"
+  },
+  "enums": {
+    "dept": {
+      "engineering": "工程部",
+      "product": "產品部",
+      "design": "設計部",
+      "marketing": "行銷部",
+      "sales": "業務部",
+      "hr": "人力資源"
+    },
+    "status": {
+      "active": "活躍",
+      "inactive": "未啟用",
+      "suspended": "已停用"
+    }
   }
 }

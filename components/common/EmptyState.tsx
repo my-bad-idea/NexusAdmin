@@ -1,4 +1,5 @@
 import { Inbox, SearchX, Lock } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 
 interface EmptyStateProps {
@@ -8,33 +9,35 @@ interface EmptyStateProps {
   onAction?: () => void;
 }
 
-const CONFIG = {
-  empty: {
-    Icon: Inbox,
-    title: (r?: string) => `No ${r ?? 'items'} yet`,
-    desc: (r?: string) => `Get started by creating your first ${r ?? 'item'}.`,
-    actionLabel: (r?: string) => `Add ${r ?? 'item'}`,
-  },
-  'no-results': {
-    Icon: SearchX,
-    title: () => 'No results found',
-    desc: (_r?: string, kw?: string) => kw ? `No results for "${kw}". Try a different search.` : 'Try adjusting your filters.',
-    actionLabel: () => 'Clear filters',
-  },
-  'no-permission': {
-    Icon: Lock,
-    title: () => 'Access restricted',
-    desc: () => "You don't have permission to view this content.",
-    actionLabel: () => '',
-  },
+const ICONS = {
+  empty: Inbox,
+  'no-results': SearchX,
+  'no-permission': Lock,
 };
 
 export function EmptyState({ scene, resource, keyword, onAction }: EmptyStateProps) {
-  const cfg = CONFIG[scene];
-  const { Icon } = cfg;
-  const title = cfg.title(resource);
-  const desc = scene === 'no-results' ? CONFIG['no-results'].desc(resource, keyword) : cfg.desc(resource);
-  const actionLabel = cfg.actionLabel(resource);
+  const t = useTranslations('empty');
+  const Icon = ICONS[scene];
+  const res = resource ?? t('defaultResource');
+
+  let title: string;
+  let desc: string;
+  let actionLabel = '';
+
+  if (scene === 'empty') {
+    title = t('emptyTitle', { resource: res });
+    desc = t('emptyDesc', { resource: res });
+    actionLabel = t('emptyAction', { resource: res });
+  } else if (scene === 'no-results') {
+    title = t('noResultsTitle');
+    desc = keyword
+      ? t('noResultsDescKeyword', { keyword })
+      : t('noResultsDesc');
+    actionLabel = t('noResultsAction');
+  } else {
+    title = t('noPermissionTitle');
+    desc = t('noPermissionDesc');
+  }
 
   return (
     <div

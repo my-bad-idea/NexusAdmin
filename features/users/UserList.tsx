@@ -16,7 +16,7 @@ import { DestructiveButton } from '@/components/ui/DestructiveButton';
 import { WarnButton } from '@/components/ui/WarnButton';
 import { UserForm } from './UserForm';
 import { createUserColumns } from './columns';
-import { fetchUsers, createUser, updateUser, deleteUser, batchDisableUsers } from '@/queries/users';
+import { fetchUsers, createUser, updateUser, deleteUser, batchDeleteUsers, batchDisableUsers } from '@/queries/users';
 import { UserProfile } from '@/types/user';
 import { UserSchemaData } from './schema';
 import { Search, SlidersHorizontal } from 'lucide-react';
@@ -32,30 +32,30 @@ function getAdvFilterFields(t: (key: string) => string): FilterFieldConfig[] {
       key: 'department', label: t('advFilter.department'), type: 'select',
       options: [
         { label: t('advFilter.allDepartments'), value: '' },
-        { label: 'Engineering', value: 'Engineering' },
-        { label: 'Product', value: 'Product' },
-        { label: 'Design', value: 'Design' },
-        { label: 'Marketing', value: 'Marketing' },
-        { label: 'Sales', value: 'Sales' },
-        { label: 'HR', value: 'HR' },
+        { label: t('enums.dept.engineering'), value: 'Engineering' },
+        { label: t('enums.dept.product'), value: 'Product' },
+        { label: t('enums.dept.design'), value: 'Design' },
+        { label: t('enums.dept.marketing'), value: 'Marketing' },
+        { label: t('enums.dept.sales'), value: 'Sales' },
+        { label: t('enums.dept.hr'), value: 'HR' },
       ],
     },
     {
       key: 'role', label: t('advFilter.role'), type: 'select', halfRow: true,
       options: [
         { label: t('advFilter.allRoles'), value: '' },
-        { label: 'Admin', value: 'Admin' },
-        { label: 'Editor', value: 'Editor' },
-        { label: 'Viewer', value: 'Viewer' },
+        { label: t('roles.admin'), value: 'Admin' },
+        { label: t('roles.editor'), value: 'Editor' },
+        { label: t('roles.viewer'), value: 'Viewer' },
       ],
     },
     {
       key: 'status', label: t('advFilter.status'), type: 'select', halfRow: true,
       options: [
         { label: t('advFilter.allStatus'), value: '' },
-        { label: 'Active', value: 'Active' },
-        { label: 'Inactive', value: 'Inactive' },
-        { label: 'Suspended', value: 'Suspended' },
+        { label: t('enums.status.active'), value: 'Active' },
+        { label: t('enums.status.inactive'), value: 'Inactive' },
+        { label: t('enums.status.suspended'), value: 'Suspended' },
       ],
     },
     { key: 'createdDate', label: t('advFilter.createdDate'), type: 'date-range' },
@@ -100,13 +100,15 @@ export function UserList() {
   const [batchDeleteOpen, setBatchDeleteOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [advFilterOpen, setAdvFilterOpen] = useState(false);
-  const [advFilterValue, setAdvFilterValue] = useState<Record<string, unknown>>({});
 
+  // Advanced filter keys — count active filters from URL params
+  const ADV_FILTER_KEYS = ['keyword', 'department', 'role', 'status', 'createdDate', 'lastLogin', 'permissions', 'tags'] as const;
   const advFilterCount = useMemo(
-    () => Object.values(advFilterValue).filter(
-      (v) => v !== '' && v !== undefined && v !== null && !(Array.isArray(v) && v.length === 0)
-    ).length,
-    [advFilterValue]
+    () => ADV_FILTER_KEYS.filter((k) => {
+      const v = list.filters[k];
+      return v !== '' && v !== undefined;
+    }).length,
+    [list.filters]
   );
 
   const createAction = useAction<UserProfile, UserSchemaData>({
@@ -137,6 +139,12 @@ export function UserList() {
       t('users.disabledCount', { count: data.succeeded.length }),
   });
 
+  const batchDeleteAction = useAction<void, string[]>({
+    mutationFn: batchDeleteUsers,
+    invalidateKeys: [USERS_KEY],
+    successMessage: t('users.deletedSuccess'),
+  });
+
   const handleEdit = useCallback((user: UserProfile) => {
     setEditUser(user);
     setFormOpen(true);
@@ -154,8 +162,10 @@ export function UserList() {
     }
   };
 
-  const handleAdvApply = () => {
-    Object.entries(advFilterValue).forEach(([key, val]) => {
+  const handleAdvApply = (values: Record<string, unknown>) => {
+    // Clear all advanced filter keys first, then set new values
+    ADV_FILTER_KEYS.forEach((key) => {
+      const val = values[key];
       if (val && !(Array.isArray(val) && val.length === 0)) {
         list.setFilter(key, Array.isArray(val) ? val.join(',') : String(val));
       } else {
@@ -165,8 +175,7 @@ export function UserList() {
   };
 
   const handleAdvReset = () => {
-    setAdvFilterValue({});
-    Object.keys(advFilterValue).forEach((key) => list.setFilter(key, ''));
+    ADV_FILTER_KEYS.forEach((key) => list.setFilter(key, ''));
   };
 
   const advFilterFields = useMemo(() => getAdvFilterFields(t), [t]);
@@ -267,9 +276,9 @@ export function UserList() {
           }}
         >
           <option value="">{t('users.roleAll')}</option>
-          <option value="Admin">Admin</option>
-          <option value="Editor">Editor</option>
-          <option value="Viewer">Viewer</option>
+          <option value="Admin">{t('roles.admin')}</option>
+          <option value="Editor">{t('roles.editor')}</option>
+          <option value="Viewer">{t('roles.viewer')}</option>
         </select>
         <select
           value={list.filters.status ?? ''}
@@ -286,9 +295,9 @@ export function UserList() {
           }}
         >
           <option value="">{t('users.statusAll')}</option>
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-          <option value="Suspended">Suspended</option>
+          <option value="Active">{t('enums.status.active')}</option>
+          <option value="Inactive">{t('enums.status.inactive')}</option>
+          <option value="Suspended">{t('enums.status.suspended')}</option>
         </select>
         <DatePicker
           value={list.filters.dateFrom ?? ''}
@@ -333,7 +342,7 @@ export function UserList() {
                 className="grid place-items-center rounded-full"
                 style={{
                   width: '16px', height: '16px',
-                  background: 'var(--accent)', color: '#fff',
+                  background: 'var(--accent)', color: 'var(--on-accent)',
                   fontFamily: 'var(--font-mono-custom)', fontSize: '9px',
                 }}
               >
@@ -358,9 +367,8 @@ export function UserList() {
         enableSelection
         onSelectionChange={setSelectedIds}
         emptyScene={hasFilters ? 'no-results' : 'empty'}
-        emptyResource="users"
+        emptyResource={t('search.users')}
         onEmptyAction={canWrite ? () => setFormOpen(true) : undefined}
-        paginationResource="users"
       />
 
       {/* Advanced Filter Drawer */}
@@ -368,8 +376,7 @@ export function UserList() {
         open={advFilterOpen}
         onClose={() => setAdvFilterOpen(false)}
         fields={advFilterFields}
-        value={advFilterValue}
-        onChange={setAdvFilterValue}
+        value={list.filters}
         onApply={handleAdvApply}
         onReset={handleAdvReset}
       />
@@ -390,7 +397,6 @@ export function UserList() {
         type="danger"
         title={t('users.deleteTitle')}
         description={t('users.deleteDesc', { name: deleteTarget?.name ?? '' })}
-        confirmText="confirm"
         onConfirm={() => deleteAction.mutateAsync(deleteTarget!.id)}
         onCancel={() => setDeleteTarget(undefined)}
       />
@@ -402,10 +408,8 @@ export function UserList() {
         title={t('users.batchDeleteTitle')}
         description={t('users.batchDeleteDesc')}
         count={selectedIds.length}
-        confirmText="confirm"
         onConfirm={async () => {
-          await Promise.all(selectedIds.map((id) => deleteUser(id)));
-          await list.refetch();
+          await batchDeleteAction.mutateAsync(selectedIds);
           setBatchDeleteOpen(false);
           setSelectedIds([]);
         }}

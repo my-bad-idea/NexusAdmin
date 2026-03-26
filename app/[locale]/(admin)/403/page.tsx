@@ -1,6 +1,10 @@
+'use client';
+
 import { Lock } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function ForbiddenPage() {
+  const t = useTranslations('forbidden');
   return (
     <div className="flex flex-col items-center justify-center min-h-screen gap-4">
       <div
@@ -10,10 +14,10 @@ export default function ForbiddenPage() {
         <Lock size={28} style={{ color: 'var(--danger)' }} />
       </div>
       <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 'var(--font-bold)', color: 'var(--txt)' }}>
-        403 — Access Forbidden
+        {t('title')}
       </h1>
       <p style={{ fontSize: 'var(--text-md)', color: 'var(--txt-muted)' }}>
-        You don&apos;t have permission to access this page.
+        {t('description')}
       </p>
     </div>
   );

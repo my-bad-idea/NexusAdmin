@@ -55,7 +55,7 @@ const avatarStyle: React.CSSProperties = {
   placeItems: 'center',
   fontFamily: 'var(--font-mono-custom)',
   fontSize: '9px',
-  color: '#fff',
+  color: 'var(--on-accent)',
   flexShrink: 0,
 };
 

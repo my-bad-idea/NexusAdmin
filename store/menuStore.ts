@@ -1,24 +1,28 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { MenuItem } from '@/types/menu';
 
 interface MenuState {
   collapsed: boolean;
-  menuItems: MenuItem[];
+  mobileOpen: boolean;
   setCollapsed: (collapsed: boolean) => void;
   toggleCollapsed: () => void;
-  setMenuItems: (items: MenuItem[]) => void;
+  setMobileOpen: (open: boolean) => void;
+  toggleMobileOpen: () => void;
 }
 
 export const useMenuStore = create<MenuState>()(
   persist(
     (set) => ({
       collapsed: false,
-      menuItems: [],
+      mobileOpen: false,
       setCollapsed: (collapsed) => set({ collapsed }),
       toggleCollapsed: () => set((s) => ({ collapsed: !s.collapsed })),
-      setMenuItems: (items) => set({ menuItems: items }),
+      setMobileOpen: (open) => set({ mobileOpen: open }),
+      toggleMobileOpen: () => set((s) => ({ mobileOpen: !s.mobileOpen })),
     }),
-    { name: 'nexus-menu' }
+    {
+      name: 'nexus-menu',
+      partialize: (state) => ({ collapsed: state.collapsed }),
+    }
   )
 );

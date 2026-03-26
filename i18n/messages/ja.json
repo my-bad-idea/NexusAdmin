@@ -91,7 +91,9 @@
     "totalUsers": "総ユーザー数",
     "totalRoles": "ロール数",
     "todayLogins": "本日のログイン",
-    "systemStatus": "システム状態"
+    "systemStatus": "システム状態",
+    "userRegistrations": "ユーザー登録推移（2024）",
+    "roleDistribution": "ロール分布"
   },
   "auth": {
     "signIn": "ログイン",
@@ -133,16 +135,69 @@
     "write": "書き込み",
     "deletePermission": "削除",
     "adminAccess": "管理者アクセス",
-    "tags": "タグ"
+    "tags": "タグ",
+    "title": "詳細フィルター",
+    "activeFilters": "有効なフィルター",
+    "clearAll": "すべてクリア",
+    "applyFilters": "フィルターを適用",
+    "keywordPlaceholder": "名前、メールまたはID...",
+    "tagsPlaceholder": "例: タグ..."
+  },
+  "forbidden": {
+    "title": "403 — アクセス禁止",
+    "description": "このページにアクセスする権限がありません。"
+  },
+  "placeholder": {
+    "comingSoon": "近日公開"
   },
   "confirm": {
     "cancel": "キャンセル",
     "delete": "削除",
-    "confirm": "確認"
+    "confirm": "確認",
+    "confirmWord": "確認",
+    "itemCount": "{count} 件",
+    "typeToConfirm": "確認のため <strong>{text}</strong> と入力してください："
   },
   "datePicker": {
     "placeholder": "日付を選択",
     "today": "今日",
     "clear": "クリア"
+  },
+  "datatable": {
+    "showing": "表示",
+    "of": "件中",
+    "perPage": "表示件数"
+  },
+  "roles": {
+    "admin": "管理者",
+    "editor": "編集者",
+    "viewer": "閲覧者"
+  },
+  "empty": {
+    "defaultResource": "アイテム",
+    "emptyTitle": "{resource}はまだありません",
+    "emptyDesc": "最初の{resource}を作成してみましょう。",
+    "emptyAction": "{resource}を追加",
+    "noResultsTitle": "結果が見つかりません",
+    "noResultsDesc": "フィルターを調整してください。",
+    "noResultsDescKeyword": "「{keyword}」の結果が見つかりません。別の検索をお試しください。",
+    "noResultsAction": "フィルターをクリア",
+    "noPermissionTitle": "アクセス制限",
+    "noPermissionDesc": "このコンテンツを表示する権限がありません。"
+  },
+  "enums": {
+    "dept": {
+      "engineering": "エンジニアリング",
+      "product": "プロダクト",
+      "design": "デザイン",
+      "marketing": "マーケティング",
+      "sales": "営業",
+      "hr": "人事"
+    },
+    "status": {
+      "active": "アクティブ",
+      "inactive": "非アクティブ",
+      "suspended": "停止中"
+    }
   }
 }

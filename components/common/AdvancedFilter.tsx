@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { SlidersHorizontal, X } from 'lucide-react';
 import { DatePicker } from './DatePicker';
 
@@ -18,9 +19,10 @@ interface AdvancedFilterProps {
   open: boolean;
   onClose: () => void;
   fields: FilterFieldConfig[];
+  /** Initial values from URL params — used to seed draft on open */
   value: Record<string, unknown>;
-  onChange: (value: Record<string, unknown>) => void;
-  onApply: () => void;
+  onChange?: (value: Record<string, unknown>) => void;
+  onApply: (values: Record<string, unknown>) => void;
   onReset: () => void;
 }
 
@@ -63,7 +65,15 @@ function blurSelect(e: React.FocusEvent<HTMLSelectElement>) {
 }
 
 export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply, onReset }: AdvancedFilterProps) {
+  const t = useTranslations();
   const drawerRef = useRef<HTMLDivElement>(null);
+  // Internal draft state — initialized from URL params (value prop) when drawer opens
+  const [draft, setDraft] = useState<Record<string, unknown>>({});
+
+  // Seed draft from URL params when drawer opens
+  useEffect(() => {
+    if (open) setDraft({ ...value });
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Lock body scroll when open
   useEffect(() => {
@@ -72,17 +82,23 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
     return () => { document.body.style.overflow = ''; };
   }, [open]);
 
-  const activeCount = Object.values(value).filter(
+  // Update draft and notify parent if onChange provided
+  const updateDraft = (next: Record<string, unknown>) => {
+    setDraft(next);
+    onChange?.(next);
+  };
+
+  const activeCount = Object.values(draft).filter(
     (v) => v !== '' && v !== undefined && v !== null && !(Array.isArray(v) && v.length === 0)
   ).length;
 
   const removeChip = (key: string) => {
-    const next = { ...value };
+    const next = { ...draft };
     delete next[key];
-    onChange(next);
+    updateDraft(next);
   };
 
-  const chips = Object.entries(value).filter(
+  const chips = Object.entries(draft).filter(
     ([, v]) => v !== '' && v !== undefined && v !== null && !(Array.isArray(v) && v.length === 0)
   );
 
@@ -103,9 +119,9 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
         return (
           <input
             style={inputStyle}
-            value={(value[field.key] as string) ?? ''}
-            onChange={(e) => onChange({ ...value, [field.key]: e.target.value })}
-            placeholder={field.key === 'keyword' ? 'Name, email or ID...' : `e.g. ${field.label.toLowerCase()}...`}
+            value={(draft[field.key] as string) ?? ''}
+            onChange={(e) => updateDraft({ ...draft, [field.key]: e.target.value })}
+            placeholder={field.key === 'keyword' ? t('advFilter.keywordPlaceholder') : field.key === 'tags' ? t('advFilter.tagsPlaceholder') : `${field.label}...`}
             onFocus={focusAccent}
             onBlur={blurAccent}
           />
@@ -114,8 +130,8 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
         return (
           <select
             style={selectStyle}
-            value={(value[field.key] as string) ?? ''}
-            onChange={(e) => onChange({ ...value, [field.key]: e.target.value })}
+            value={(draft[field.key] as string) ?? ''}
+            onChange={(e) => updateDraft({ ...draft, [field.key]: e.target.value })}
             onFocus={focusSelect}
             onBlur={blurSelect}
           >
@@ -128,8 +144,8 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
         return (
           <select
             style={selectStyle}
-            value={(value[field.key] as string) ?? ''}
-            onChange={(e) => onChange({ ...value, [field.key]: e.target.value })}
+            value={(draft[field.key] as string) ?? ''}
+            onChange={(e) => updateDraft({ ...draft, [field.key]: e.target.value })}
             onFocus={focusSelect}
             onBlur={blurSelect}
           >
@@ -142,21 +158,21 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
         return (
           <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '6px', alignItems: 'center' }}>
             <DatePicker
-              value={((value[field.key] as string[]) ?? [])[0] ?? ''}
+              value={((draft[field.key] as string[]) ?? [])[0] ?? ''}
               onChange={(v) => {
-                const arr = ((value[field.key] as string[]) ?? []).slice();
+                const arr = ((draft[field.key] as string[]) ?? []).slice();
                 arr[0] = v;
-                onChange({ ...value, [field.key]: arr });
+                updateDraft({ ...draft, [field.key]: arr });
               }}
               style={inputStyle}
             />
             <span style={{ fontSize: '11px', color: 'var(--txt-muted)', textAlign: 'center' }}>—</span>
             <DatePicker
-              value={((value[field.key] as string[]) ?? [])[1] ?? ''}
+              value={((draft[field.key] as string[]) ?? [])[1] ?? ''}
               onChange={(v) => {
-                const arr = ((value[field.key] as string[]) ?? []).slice();
+                const arr = ((draft[field.key] as string[]) ?? []).slice();
                 arr[1] = v;
-                onChange({ ...value, [field.key]: arr });
+                updateDraft({ ...draft, [field.key]: arr });
               }}
               style={inputStyle}
             />
@@ -166,7 +182,7 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
         return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {field.options?.map((opt) => {
-              const checked = ((value[field.key] as string[]) ?? []).includes(opt.value);
+              const checked = ((draft[field.key] as string[]) ?? []).includes(opt.value);
               return (
                 <label
                   key={opt.value}
@@ -182,9 +198,9 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
                     type="checkbox"
                     checked={checked}
                     onChange={(e) => {
-                      const arr = ((value[field.key] as string[]) ?? []).filter((v) => v !== opt.value);
+                      const arr = ((draft[field.key] as string[]) ?? []).filter((v) => v !== opt.value);
                       if (e.target.checked) arr.push(opt.value);
-                      onChange({ ...value, [field.key]: arr });
+                      updateDraft({ ...draft, [field.key]: arr });
                     }}
                     style={{ width: '14px', height: '14px', accentColor: 'var(--accent)', cursor: 'pointer' }}
                   />
@@ -238,10 +254,10 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
             display: 'flex', alignItems: 'center', gap: '8px',
           }}>
             <SlidersHorizontal size={14} />
-            Advanced Filters
+            {t('advFilter.title')}
             {activeCount > 0 && (
               <span style={{
-                background: 'var(--accent)', color: '#fff',
+                background: 'var(--accent)', color: 'var(--on-accent)',
                 fontFamily: 'var(--font-mono-custom)', fontSize: '10px',
                 padding: '1px 6px', borderRadius: '10px',
               }}>
@@ -270,7 +286,7 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
           {/* Active chips */}
           {chips.length > 0 && (
             <div>
-              <div style={{ ...labelStyle, marginBottom: '6px' }}>Active Filters</div>
+              <div style={{ ...labelStyle, marginBottom: '6px' }}>{t('advFilter.activeFilters')}</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                 {chips.map(([key, val]) => {
                   const field = fields.find((f) => f.key === key);
@@ -341,7 +357,7 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
           display: 'flex', gap: '8px', flexShrink: 0,
         }}>
           <button
-            onClick={() => { onReset(); }}
+            onClick={() => { setDraft({}); onReset(); }}
             style={{
               flex: 1, height: '28px', borderRadius: 'var(--radius-sm)',
               fontSize: '12px', fontWeight: 500, fontFamily: 'inherit', cursor: 'pointer',
@@ -350,19 +366,19 @@ export function AdvancedFilter({ open, onClose, fields, value, onChange, onApply
               transition: 'all .15s',
             }}
           >
-            Clear All
+            {t('advFilter.clearAll')}
           </button>
           <button
-            onClick={() => { onApply(); onClose(); }}
+            onClick={() => { onApply(draft); onClose(); }}
             style={{
               flex: 1, height: '28px', borderRadius: 'var(--radius-sm)',
               fontSize: '12px', fontWeight: 500, fontFamily: 'inherit', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: '1px solid var(--accent)', background: 'var(--accent)', color: '#fff',
+              border: '1px solid var(--accent)', background: 'var(--accent)', color: 'var(--on-accent)',
               transition: 'all .15s',
             }}
           >
-            Apply Filters
+            {t('advFilter.applyFilters')}
           </button>
         </div>
       </div>
