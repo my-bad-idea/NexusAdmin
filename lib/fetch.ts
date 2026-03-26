@@ -17,6 +17,7 @@ export async function apiFetch<T>(url: string, options?: RequestInit): Promise<T
   if (res.status === 401) {
     useAuthStore.getState().clearAuth();
     if (typeof window !== 'undefined') {
+      document.cookie = 'nexus-token=; path=/; max-age=0';
       window.location.href = '/login';
     }
     throw new Error('Unauthorized');

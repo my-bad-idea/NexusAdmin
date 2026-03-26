@@ -104,10 +104,44 @@
     "success": "ログインしました"
   },
   "search": {
-    "pages": "ページ",
+    "pagesLabel": "ページ",
     "users": "ユーザー",
     "searching": "検索中...",
-    "noResults": "結果が見つかりません"
+    "noResults": "結果が見つかりません",
+    "pages": {
+      "dashboard": "ダッシュボード",
+      "userList": "ユーザー一覧",
+      "roles": "ロールと権限",
+      "orders": "注文",
+      "products": "商品",
+      "analytics": "分析",
+      "settings": "設定"
+    },
+    "kw": {
+      "dashboard": "ダッシュボード",
+      "home": "ホーム",
+      "overview": "概要",
+      "user": "ユーザー",
+      "list": "一覧",
+      "management": "管理",
+      "member": "メンバー",
+      "role": "ロール",
+      "permission": "権限",
+      "access": "アクセス",
+      "privilege": "特権",
+      "order": "注文",
+      "purchase": "購入",
+      "product": "商品",
+      "item": "アイテム",
+      "catalog": "カタログ",
+      "analytics": "分析",
+      "chart": "チャート",
+      "report": "レポート",
+      "statistics": "統計",
+      "settings": "設定",
+      "config": "設定",
+      "preference": "環境設定"
+    }
   },
   "theme": {
     "system": "システム",

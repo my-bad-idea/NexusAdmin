@@ -1,3 +1,10 @@
+/**
+ * Template hook for standard form pages (create/edit entity).
+ * Combines data fetching, form state, and CRUD actions.
+ *
+ * Preferred for new entity form pages to avoid duplicating
+ * the fetch-form-submit-invalidate pattern.
+ */
 'use client';
 
 import { useQuery } from '@tanstack/react-query';

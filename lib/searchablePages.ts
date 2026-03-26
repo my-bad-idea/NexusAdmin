@@ -5,60 +5,62 @@ import {
 
 export interface SearchablePage {
   id: string;
-  title: string;
+  /** Translation key for the page title */
+  titleKey: string;
   path: string;
   icon: React.ComponentType<{ size?: number }>;
-  keywords: string[];
+  /** Translation keys for search keywords */
+  keywordKeys: string[];
 }
 
 export const SEARCHABLE_PAGES: SearchablePage[] = [
   {
     id: 'dashboard',
-    title: 'Dashboard',
+    titleKey: 'search.pages.dashboard',
     path: '/dashboard',
     icon: LayoutDashboard,
-    keywords: ['dashboard', 'home', 'overview'],
+    keywordKeys: ['search.kw.dashboard', 'search.kw.home', 'search.kw.overview'],
   },
   {
     id: 'user-list',
-    title: 'User List',
+    titleKey: 'search.pages.userList',
     path: '/users',
     icon: List,
-    keywords: ['user', 'list', 'management', 'member'],
+    keywordKeys: ['search.kw.user', 'search.kw.list', 'search.kw.management', 'search.kw.member'],
   },
   {
     id: 'roles',
-    title: 'Roles & Permissions',
+    titleKey: 'search.pages.roles',
     path: '/roles',
     icon: Shield,
-    keywords: ['role', 'permission', 'access', 'privilege'],
+    keywordKeys: ['search.kw.role', 'search.kw.permission', 'search.kw.access', 'search.kw.privilege'],
   },
   {
     id: 'orders',
-    title: 'Orders',
+    titleKey: 'search.pages.orders',
     path: '/orders',
     icon: FolderOpen,
-    keywords: ['order', 'purchase'],
+    keywordKeys: ['search.kw.order', 'search.kw.purchase'],
   },
   {
     id: 'products',
-    title: 'Products',
+    titleKey: 'search.pages.products',
     path: '/products',
     icon: Package,
-    keywords: ['product', 'item', 'catalog'],
+    keywordKeys: ['search.kw.product', 'search.kw.item', 'search.kw.catalog'],
   },
   {
     id: 'analytics',
-    title: 'Analytics',
+    titleKey: 'search.pages.analytics',
     path: '/analytics',
     icon: BarChart3,
-    keywords: ['analytics', 'chart', 'report', 'statistics'],
+    keywordKeys: ['search.kw.analytics', 'search.kw.chart', 'search.kw.report', 'search.kw.statistics'],
   },
   {
     id: 'settings',
-    title: 'Settings',
+    titleKey: 'search.pages.settings',
     path: '/settings',
     icon: Settings,
-    keywords: ['settings', 'config', 'preference'],
+    keywordKeys: ['search.kw.settings', 'search.kw.config', 'search.kw.preference'],
   },
 ];

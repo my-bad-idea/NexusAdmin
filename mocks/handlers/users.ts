@@ -5,16 +5,76 @@ import { UserDTO } from '@/types/user';
 export const usersHandlers = [
   http.get('/api/users', ({ request }) => {
     const url = new URL(request.url);
-    const page     = Number(url.searchParams.get('page') ?? 1);
-    const pageSize = Number(url.searchParams.get('size') ?? 20);
-    const keyword  = url.searchParams.get('keyword') ?? '';
-    const role     = url.searchParams.get('role') ?? '';
-    const status   = url.searchParams.get('status') ?? '';
+    const page       = Number(url.searchParams.get('page') ?? 1);
+    const pageSize   = Number(url.searchParams.get('size') ?? 20);
+    const keyword    = url.searchParams.get('keyword') ?? '';
+    const role       = url.searchParams.get('role') ?? '';
+    const status     = url.searchParams.get('status') ?? '';
+    const department = url.searchParams.get('department') ?? '';
+    const createdDate = url.searchParams.get('createdDate') ?? '';
+    const lastLogin  = url.searchParams.get('lastLogin') ?? '';
+    const permissions = url.searchParams.get('permissions') ?? '';
+    const tags       = url.searchParams.get('tags') ?? '';
+    const sort       = url.searchParams.get('sort') ?? '';
 
     let filtered = [...MOCK_USERS];
-    if (keyword) filtered = filtered.filter((u) => u.name.toLowerCase().includes(keyword.toLowerCase()) || u.email.toLowerCase().includes(keyword.toLowerCase()));
-    if (role)    filtered = filtered.filter((u) => u.role === role);
-    if (status)  filtered = filtered.filter((u) => u.status === status);
+    if (keyword)    filtered = filtered.filter((u) => u.name.toLowerCase().includes(keyword.toLowerCase()) || u.email.toLowerCase().includes(keyword.toLowerCase()));
+    if (role)       filtered = filtered.filter((u) => u.role === role);
+    if (status)     filtered = filtered.filter((u) => u.status === status);
+    if (department) filtered = filtered.filter((u) => u.department === department);
+
+    // createdDate: "start,end" ISO date range
+    if (createdDate) {
+      const [start, end] = createdDate.split(',');
+      if (start) filtered = filtered.filter((u) => u.createdAt && u.createdAt >= start);
+      if (end)   filtered = filtered.filter((u) => u.createdAt && u.createdAt <= end + 'T23:59:59Z');
+    }
+
+    // lastLogin: preset (1d/7d/30d/90d/never)
+    if (lastLogin) {
+      const now = Date.now();
+      if (lastLogin === 'never') {
+        filtered = filtered.filter((u) => !u.lastLogin);
+      } else {
+        const days = parseInt(lastLogin);
+        if (!isNaN(days)) {
+          const cutoff = new Date(now - days * 86400000).toISOString();
+          filtered = filtered.filter((u) => u.lastLogin && u.lastLogin >= cutoff);
+        }
+      }
+    }
+
+    // tags: comma-separated, match any
+    if (tags) {
+      const tagList = tags.split(',').map((t) => t.trim().toLowerCase());
+      filtered = filtered.filter((u) => u.tags?.some((ut) => tagList.includes(ut.toLowerCase())));
+    }
+
+    // permissions: comma-separated — mock maps role → permissions for filtering
+    if (permissions) {
+      const permList = permissions.split(',');
+      const rolePerms: Record<string, string[]> = {
+        Admin: ['read', 'write', 'delete', 'admin'],
+        Editor: ['read', 'write'],
+        Viewer: ['read'],
+      };
+      filtered = filtered.filter((u) => {
+        const userPerms = rolePerms[u.role] ?? [];
+        return permList.some((p) => userPerms.includes(p));
+      });
+    }
+
+    // Sorting: "field:asc" or "field:desc"
+    if (sort) {
+      const [field, dir] = sort.split(':');
+      const asc = dir !== 'desc';
+      filtered.sort((a, b) => {
+        const av = (a as unknown as Record<string, unknown>)[field] ?? '';
+        const bv = (b as unknown as Record<string, unknown>)[field] ?? '';
+        const cmp = String(av).localeCompare(String(bv));
+        return asc ? cmp : -cmp;
+      });
+    }
 
     const list = filtered.slice((page - 1) * pageSize, page * pageSize);
     return HttpResponse.json({ code: 0, data: { list, total: filtered.length, page, pageSize }, message: 'ok' });

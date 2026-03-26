@@ -4,7 +4,6 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   SortingState,
   useReactTable,
   RowSelectionState,
@@ -35,6 +34,8 @@ interface DataTableProps<T extends { id: string }> {
   density?: 'compact' | 'relaxed';
   striped?: boolean;
   enableSorting?: boolean;
+  sortState?: SortingState;
+  onSortChange?: (updater: SortingState | ((prev: SortingState) => SortingState)) => void;
   enableColumnVisibility?: boolean;
   mobileView?: 'auto' | 'table' | 'card';
   hiddenColumns?: string[];
@@ -73,10 +74,14 @@ export function DataTable<T extends { id: string }>({
   density = 'compact',
   striped = true,
   enableSorting = true,
+  sortState: externalSortState,
+  onSortChange: externalOnSortChange,
   paginationResource,
 }: DataTableProps<T>) {
   const t = useTranslations();
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [internalSorting, setInternalSorting] = useState<SortingState>([]);
+  const sorting = externalSortState ?? internalSorting;
+  const setSorting = externalOnSortChange ?? setInternalSorting;
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const selectionColumn: ColumnDef<T> = {
@@ -86,8 +91,8 @@ export function DataTable<T extends { id: string }>({
         type="checkbox"
         checked={table.getIsAllPageRowsSelected()}
         onChange={table.getToggleAllPageRowsSelectedHandler()}
-        className="cursor-pointer"
-        style={{ accentColor: 'var(--accent)', verticalAlign: 'middle' }}
+        className="cursor-pointer align-middle"
+        style={{ accentColor: 'var(--accent)' }}
       />
     ),
     cell: ({ row }) => (
@@ -96,8 +101,8 @@ export function DataTable<T extends { id: string }>({
         checked={row.getIsSelected()}
         onChange={row.getToggleSelectedHandler()}
         onClick={(e) => e.stopPropagation()}
-        className="cursor-pointer"
-        style={{ accentColor: 'var(--accent)', verticalAlign: 'middle' }}
+        className="cursor-pointer align-middle"
+        style={{ accentColor: 'var(--accent)' }}
       />
     ),
     size: 40,
@@ -112,10 +117,10 @@ export function DataTable<T extends { id: string }>({
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getRowId: (row) => row.id,
     enableRowSelection: enableSelection,
     manualPagination: true,
+    manualSorting: true,
     pageCount: Math.ceil(total / pageSize),
   });
 
@@ -126,7 +131,6 @@ export function DataTable<T extends { id: string }>({
   }, [rowSelection, onSelectionChange]);
 
   const totalPages = Math.ceil(total / pageSize);
-  const py = density === 'compact' ? 'py-2 px-3' : 'py-3 px-4';
 
   if (isLoading) {
     return <SkeletonTable rows={7} columns={columns.length + (enableSelection ? 1 : 0)} />;
@@ -134,10 +138,7 @@ export function DataTable<T extends { id: string }>({
 
   if (error) {
     return (
-      <div
-        className="rounded-[var(--table-radius)] p-8 text-center border border-[var(--border)]"
-        style={{ background: 'var(--white)', color: 'var(--danger)' }}
-      >
+      <div className="rounded-[var(--table-radius)] p-8 text-center border border-[var(--border)] bg-[var(--white)] text-[var(--danger)]">
         {error.message}
       </div>
     );
@@ -145,10 +146,7 @@ export function DataTable<T extends { id: string }>({
 
   if (data.length === 0 && !isLoading) {
     return (
-      <div
-        className="rounded-[var(--table-radius)] border border-[var(--border)]"
-        style={{ background: 'var(--white)' }}
-      >
+      <div className="rounded-[var(--table-radius)] border border-[var(--border)] bg-[var(--white)]">
         <EmptyState scene={emptyScene} resource={emptyResource} onAction={onEmptyAction} />
       </div>
     );
@@ -158,60 +156,50 @@ export function DataTable<T extends { id: string }>({
     <div className="flex flex-col gap-2">
       {/* Fetching progress bar */}
       {isFetching && !isLoading && (
-        <div className="h-0.5 rounded-full overflow-hidden" style={{ background: 'var(--accent-light)' }}>
-          <div
-            className="h-full rounded-full animate-pulse"
-            style={{ width: '60%', background: 'var(--accent)' }}
-          />
+        <div className="h-0.5 rounded-full overflow-hidden bg-[var(--accent-light)]">
+          <div className="h-full rounded-full animate-pulse w-[60%] bg-[var(--accent)]" />
         </div>
       )}
 
-      {/* Table wrapper - hide on mobile if auto, show cards */}
-      <div
-        className="rounded-[var(--table-radius)] overflow-hidden border border-[var(--table-border)]"
-        style={{ background: 'var(--white)', boxShadow: 'var(--shadow-1)' }}
-      >
+      {/* Table wrapper */}
+      <div className="rounded-[var(--table-radius)] overflow-hidden border border-[var(--table-border)] bg-[var(--white)] shadow-[var(--shadow-1)]">
         {/* Desktop table */}
         <div className="hidden md:block overflow-x-auto">
-          <table className="w-full border-collapse" style={{ minWidth: '700px' }}>
+          <table className="w-full border-collapse min-w-[700px]">
             <thead>
               {table.getHeaderGroups().map((hg) => (
-                <tr key={hg.id} style={{ background: 'var(--table-header-bg)', borderBottom: '1px solid var(--table-border)' }}>
-                  {hg.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      style={{
-                        padding: header.column.id === 'select' ? '7px 0' : '7px 10px',
-                        textAlign: header.column.id === 'select' ? 'center' : 'left',
-                        fontSize: '10.5px',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: '.05em',
-                        color: 'var(--table-header-text)',
-                        verticalAlign: 'middle',
-                        width: header.getSize() !== 150 ? header.getSize() : undefined,
-                        cursor: enableSorting && header.column.getCanSort() ? 'pointer' : 'default',
-                        userSelect: 'none',
-                        whiteSpace: 'nowrap',
-                      }}
-                      onClick={enableSorting ? header.column.getToggleSortingHandler() : undefined}
-                    >
-                      {header.column.id === 'select' ? (
-                        flexRender(header.column.columnDef.header, header.getContext())
-                      ) : (
-                        <span className="inline-flex items-center gap-1">
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {enableSorting && header.column.getCanSort() && (
-                            <span style={{ opacity: 0.4, fontSize: '9px', marginLeft: '2px' }}>
-                              {header.column.getIsSorted() === 'asc' ? '↑'
-                                : header.column.getIsSorted() === 'desc' ? '↓'
-                                : '↕'}
-                            </span>
-                          )}
-                        </span>
-                      )}
-                    </th>
-                  ))}
+                <tr key={hg.id} className="bg-[var(--table-header-bg)] border-b border-[var(--table-border)]">
+                  {hg.headers.map((header) => {
+                    const isSelect = header.column.id === 'select';
+                    const canSort = enableSorting && header.column.getCanSort();
+                    return (
+                      <th
+                        key={header.id}
+                        className={cn(
+                          'py-[7px] text-[10.5px] font-semibold uppercase tracking-[.05em] text-[var(--table-header-text)] align-middle select-none whitespace-nowrap',
+                          isSelect ? 'px-0 text-center' : 'px-2.5 text-left',
+                          canSort && 'cursor-pointer',
+                        )}
+                        style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}
+                        onClick={enableSorting ? header.column.getToggleSortingHandler() : undefined}
+                      >
+                        {isSelect ? (
+                          flexRender(header.column.columnDef.header, header.getContext())
+                        ) : (
+                          <span className="inline-flex items-center gap-1">
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {canSort && (
+                              <span className="opacity-40 text-[9px] ml-0.5">
+                                {header.column.getIsSorted() === 'asc' ? '↑'
+                                  : header.column.getIsSorted() === 'desc' ? '↓'
+                                  : '↕'}
+                              </span>
+                            )}
+                          </span>
+                        )}
+                      </th>
+                    );
+                  })}
                 </tr>
               ))}
             </thead>
@@ -230,20 +218,20 @@ export function DataTable<T extends { id: string }>({
                   )}
                   onClick={() => enableSelection && row.toggleSelected()}
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      style={{
-                        padding: cell.column.id === 'select' ? '8px 0' : '8px 10px',
-                        textAlign: cell.column.id === 'select' ? 'center' : undefined,
-                        fontSize: '12.5px',
-                        color: 'var(--txt)',
-                        verticalAlign: 'middle',
-                      }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const isSelect = cell.column.id === 'select';
+                    return (
+                      <td
+                        key={cell.id}
+                        className={cn(
+                          'py-2 text-[12.5px] text-[var(--txt)] align-middle',
+                          isSelect ? 'px-0 text-center' : 'px-2.5',
+                        )}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>
@@ -267,7 +255,7 @@ export function DataTable<T extends { id: string }>({
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     {firstTwo.map((cell) => (
-                      <div key={cell.id} style={{ fontSize: 'var(--text-sm)' }}>
+                      <div key={cell.id} className="text-[var(--text-sm)]">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </div>
                     ))}
@@ -278,7 +266,7 @@ export function DataTable<T extends { id: string }>({
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {cells.slice(2).filter((c) => c.column.id !== 'actions').map((cell) => (
-                    <span key={cell.id} style={{ fontSize: 'var(--text-xs)' }}>
+                    <span key={cell.id} className="text-[var(--text-xs)]">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </span>
                   ))}
@@ -288,24 +276,16 @@ export function DataTable<T extends { id: string }>({
           })}
         </div>
 
-        {/* Pagination — inside card with border-top */}
+        {/* Pagination */}
         {total > 0 && onPageChange && (
-          <div
-            className="flex items-center justify-between flex-wrap gap-2"
-            style={{
-              borderTop: '1px solid var(--border)',
-              padding: '8px 12px',
-              fontSize: '11px',
-              color: 'var(--txt-muted)',
-            }}
-          >
-            <div className="pagination-info">
+          <div className="flex items-center justify-between flex-wrap gap-2 border-t border-[var(--border)] px-3 py-2 text-[11px] text-[var(--txt-muted)]">
+            <div>
               {t('datatable.showing')}{' '}
-              <span style={{ fontFamily: 'var(--font-mono-custom)', fontWeight: 500, color: 'var(--txt-sec)' }}>
+              <span className="font-[var(--font-mono)] font-medium text-[var(--txt-sec)]">
                 {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)}
               </span>{' '}
               {t('datatable.of')}{' '}
-              <span style={{ fontFamily: 'var(--font-mono-custom)', fontWeight: 500, color: 'var(--txt-sec)' }}>
+              <span className="font-[var(--font-mono)] font-medium text-[var(--txt-sec)]">
                 {total}
               </span>
               {paginationResource ? ` ${paginationResource}` : ''}
@@ -314,38 +294,26 @@ export function DataTable<T extends { id: string }>({
               <button
                 onClick={() => onPageChange(page - 1, pageSize)}
                 disabled={page <= 1}
-                className="grid place-items-center rounded-[var(--radius-sm)] transition-all"
-                style={{
-                  width: '24px', height: '24px',
-                  border: '1px solid var(--border)',
-                  background: page <= 1 ? 'var(--bg)' : 'var(--bg)',
-                  color: page <= 1 ? 'var(--txt-muted)' : 'var(--txt-sec)',
-                  cursor: page <= 1 ? 'default' : 'pointer',
-                  opacity: page <= 1 ? 0.35 : 1,
-                  fontSize: '11.5px', fontFamily: 'var(--font-mono-custom)',
-                }}
+                className={cn(
+                  'grid place-items-center w-6 h-6 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--bg)] font-[var(--font-mono)] text-[11.5px] transition-all',
+                  page <= 1 ? 'text-[var(--txt-muted)] opacity-35 cursor-default' : 'text-[var(--txt-sec)] cursor-pointer',
+                )}
               >
                 <ChevronLeft size={12} />
               </button>
               {getPageNumbers(page, totalPages).map((p, i) =>
                 p === '...' ? (
-                  <span key={`sep-${i}`} style={{ color: 'var(--txt-muted)', fontSize: '12px', padding: '0 2px' }}>
-                    ···
-                  </span>
+                  <span key={`sep-${i}`} className="text-[var(--txt-muted)] text-[12px] px-0.5">···</span>
                 ) : (
                   <button
                     key={p}
                     onClick={() => onPageChange(p, pageSize)}
-                    className="grid place-items-center rounded-[var(--radius-sm)] transition-all"
-                    style={{
-                      width: '24px', height: '24px',
-                      border: `1px solid ${p === page ? 'var(--accent)' : 'var(--border)'}`,
-                      background: p === page ? 'var(--accent)' : 'var(--bg)',
-                      color: p === page ? 'var(--on-accent)' : 'var(--txt-sec)',
-                      fontWeight: p === page ? 600 : 400,
-                      cursor: 'pointer',
-                      fontSize: '11.5px', fontFamily: 'var(--font-mono-custom)',
-                    }}
+                    className={cn(
+                      'grid place-items-center w-6 h-6 rounded-[var(--radius-sm)] font-[var(--font-mono)] text-[11.5px] cursor-pointer transition-all border',
+                      p === page
+                        ? 'border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)] font-semibold'
+                        : 'border-[var(--border)] bg-[var(--bg)] text-[var(--txt-sec)]',
+                    )}
                   >
                     {p}
                   </button>
@@ -354,22 +322,16 @@ export function DataTable<T extends { id: string }>({
               <button
                 onClick={() => onPageChange(page + 1, pageSize)}
                 disabled={page >= totalPages}
-                className="grid place-items-center rounded-[var(--radius-sm)] transition-all"
-                style={{
-                  width: '24px', height: '24px',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
-                  color: page >= totalPages ? 'var(--txt-muted)' : 'var(--txt-sec)',
-                  cursor: page >= totalPages ? 'default' : 'pointer',
-                  opacity: page >= totalPages ? 0.35 : 1,
-                  fontSize: '11.5px', fontFamily: 'var(--font-mono-custom)',
-                }}
+                className={cn(
+                  'grid place-items-center w-6 h-6 rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--bg)] font-[var(--font-mono)] text-[11.5px] transition-all',
+                  page >= totalPages ? 'text-[var(--txt-muted)] opacity-35 cursor-default' : 'text-[var(--txt-sec)] cursor-pointer',
+                )}
               >
                 <ChevronRight size={12} />
               </button>
             </div>
             <div className="flex items-center gap-1.5">
-              <span style={{ fontSize: '11px', color: 'var(--txt-muted)' }}>{t('datatable.perPage')}</span>
+              <span className="text-[11px] text-[var(--txt-muted)]">{t('datatable.perPage')}</span>
               <select
                 value={pageSize}
                 onChange={(e) => {
@@ -377,18 +339,8 @@ export function DataTable<T extends { id: string }>({
                   if (onPageSizeChange) onPageSizeChange(newSize);
                   else onPageChange(1, newSize);
                 }}
-                style={{
-                  height: '24px', padding: '0 20px 0 7px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg)',
-                  fontSize: '11px', fontFamily: 'var(--font-mono-custom)',
-                  color: 'var(--txt)', cursor: 'pointer', outline: 'none',
-                  WebkitAppearance: 'none', appearance: 'none',
-                  backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'right 5px center',
-                }}
+                className="nx-select-mini"
+                style={{ height: '24px' }}
               >
                 <option value={10}>10</option>
                 <option value={20}>20</option>

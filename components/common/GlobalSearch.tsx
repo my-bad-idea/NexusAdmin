@@ -135,7 +135,7 @@ export function GlobalSearch() {
           {/* Pages group */}
           {pages.length > 0 && (
             <div>
-              <div style={groupLabelStyle} role="presentation">{t('search.pages')}</div>
+              <div style={groupLabelStyle} role="presentation">{t('search.pagesLabel')}</div>
               {pages.map((page) => {
                 flatIdx++;
                 const idx = flatIdx;

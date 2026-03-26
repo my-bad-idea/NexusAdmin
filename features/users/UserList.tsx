@@ -22,6 +22,7 @@ import { UserSchemaData } from './schema';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 import { DatePicker } from '@/components/common/DatePicker';
+import { cn } from '@/lib/utils';
 
 const USERS_KEY = ['users'];
 
@@ -163,36 +164,34 @@ export function UserList() {
   };
 
   const handleAdvApply = (values: Record<string, unknown>) => {
-    // Clear all advanced filter keys first, then set new values
+    const updates: Record<string, string> = {};
     ADV_FILTER_KEYS.forEach((key) => {
       const val = values[key];
       if (val && !(Array.isArray(val) && val.length === 0)) {
-        list.setFilter(key, Array.isArray(val) ? val.join(',') : String(val));
+        updates[key] = Array.isArray(val) ? val.join(',') : String(val);
       } else {
-        list.setFilter(key, '');
+        updates[key] = '';
       }
     });
+    list.setFilters(updates);
   };
 
   const handleAdvReset = () => {
-    ADV_FILTER_KEYS.forEach((key) => list.setFilter(key, ''));
+    const updates: Record<string, string> = {};
+    ADV_FILTER_KEYS.forEach((key) => { updates[key] = ''; });
+    list.setFilters(updates);
   };
 
   const advFilterFields = useMemo(() => getAdvFilterFields(t), [t]);
   const columns = createUserColumns(handleEdit, handleDelete, t);
-  const hasFilters = list.filters.keyword || list.filters.role || list.filters.status || list.filters.dateFrom;
+  const hasFilters = ADV_FILTER_KEYS.some((k) => list.filters[k]);
 
   return (
     <PageContainer
       title={t('users.title')}
       titleExtra={selectedIds.length > 0 ? (
-        <span style={{
-          display: 'flex', alignItems: 'center', gap: '5px',
-          padding: '3px 10px', borderRadius: 'var(--radius-sm)',
-          background: 'var(--accent-light)', color: 'var(--accent)',
-          fontSize: '11.5px', fontWeight: 500,
-        }}>
-          ✓ <span style={{ fontFamily: 'var(--font-mono-custom)', fontWeight: 700 }}>
+        <span className="flex items-center gap-[5px] px-2.5 py-[3px] rounded-[var(--radius-sm)] bg-[var(--accent-light)] text-[var(--accent)] text-[11.5px] font-medium">
+          ✓ <span className="font-[var(--font-mono)] font-bold">
             {selectedIds.length}
           </span> {t('users.selected')}
         </span>
@@ -231,49 +230,24 @@ export function UserList() {
       }
     >
       {/* FilterBar */}
-      <div
-        className="flex flex-wrap items-center gap-2 mb-[10px] rounded-[var(--radius-md)] px-3 py-2"
-        style={{ background: 'var(--white)', border: '1px solid var(--border)' }}
-      >
+      <div className="flex flex-wrap items-center gap-2 mb-[10px] rounded-[var(--radius-md)] px-3 py-2 bg-[var(--white)] border border-[var(--border)]">
         <div className="relative flex-1 min-w-[160px]">
           <Search
             size={12}
-            className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none"
-            style={{ color: 'var(--txt-muted)' }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--txt-muted)]"
           />
           <input
             placeholder={t('users.searchPlaceholder')}
             value={list.filters.keyword ?? ''}
             onChange={(e) => list.setFilter('keyword', e.target.value)}
-            style={{
-              width: '100%', height: '28px', paddingLeft: '28px', paddingRight: '8px',
-              border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
-              fontSize: '12px', background: 'var(--bg)', color: 'var(--txt)',
-              outline: 'none', transition: 'border-color .15s, box-shadow .15s',
-            }}
-            onFocus={(e) => {
-              e.currentTarget.style.borderColor = 'var(--accent)';
-              e.currentTarget.style.boxShadow = '0 0 0 3px rgba(99,102,241,.12)';
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.borderColor = 'var(--border)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
+            className="nx-input nx-input-sm"
+            style={{ paddingLeft: 28, paddingRight: 8 }}
           />
         </div>
         <select
           value={list.filters.role ?? ''}
           onChange={(e) => list.setFilter('role', e.target.value)}
-          className="shrink-0"
-          style={{
-            height: '28px', padding: '0 24px 0 8px', minWidth: '120px',
-            border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
-            fontSize: '12px', background: 'var(--bg)', color: 'var(--txt)',
-            outline: 'none', cursor: 'pointer',
-            WebkitAppearance: 'none', appearance: 'none' as const,
-            backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
-            backgroundRepeat: 'no-repeat', backgroundPosition: 'right 7px center',
-          }}
+          className="nx-select nx-select-sm shrink-0"
         >
           <option value="">{t('users.roleAll')}</option>
           <option value="Admin">{t('roles.admin')}</option>
@@ -283,16 +257,7 @@ export function UserList() {
         <select
           value={list.filters.status ?? ''}
           onChange={(e) => list.setFilter('status', e.target.value)}
-          className="shrink-0"
-          style={{
-            height: '28px', padding: '0 24px 0 8px', minWidth: '120px',
-            border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)',
-            fontSize: '12px', background: 'var(--bg)', color: 'var(--txt)',
-            outline: 'none', cursor: 'pointer',
-            WebkitAppearance: 'none', appearance: 'none' as const,
-            backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
-            backgroundRepeat: 'no-repeat', backgroundPosition: 'right 7px center',
-          }}
+          className="nx-select nx-select-sm shrink-0"
         >
           <option value="">{t('users.statusAll')}</option>
           <option value="Active">{t('enums.status.active')}</option>
@@ -302,11 +267,7 @@ export function UserList() {
         <DatePicker
           value={list.filters.dateFrom ?? ''}
           onChange={(v) => list.setFilter('dateFrom', v)}
-          className="shrink-0"
-          style={{
-            height: '28px', minWidth: '160px',
-            fontSize: '11px', fontFamily: 'var(--font-mono-custom)',
-          }}
+          className="shrink-0 h-7 min-w-[160px] text-[11px] font-[var(--font-mono)]"
         />
         <div className="flex gap-1.5 ml-auto">
           <PrimaryButton
@@ -317,35 +278,23 @@ export function UserList() {
           </PrimaryButton>
           <GhostButton
             onClick={list.resetFilters}
-            className="h-[28px] px-3 text-[12px]"
-            style={{ border: '1px solid var(--border)' }}
+            className="h-[28px] px-3 text-[12px] border border-[var(--border)]"
           >
             {t('users.reset')}
           </GhostButton>
           <button
             onClick={() => setAdvFilterOpen(true)}
-            className="inline-flex items-center gap-[5px] shrink-0 transition-all"
-            style={{
-              height: '28px', padding: '0 10px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '12px', fontWeight: 500,
-              border: `1px solid ${advFilterCount > 0 ? 'var(--accent)' : 'var(--border)'}`,
-              background: advFilterCount > 0 ? 'var(--accent-light)' : 'var(--bg)',
-              color: advFilterCount > 0 ? 'var(--accent)' : 'var(--txt-sec)',
-              cursor: 'pointer',
-            }}
+            className={cn(
+              'inline-flex items-center gap-[5px] shrink-0 h-7 px-2.5 rounded-[var(--radius-sm)] text-[12px] font-medium cursor-pointer border transition-all',
+              advFilterCount > 0
+                ? 'border-[var(--accent)] bg-[var(--accent-light)] text-[var(--accent)]'
+                : 'border-[var(--border)] bg-[var(--bg)] text-[var(--txt-sec)]',
+            )}
           >
             <SlidersHorizontal size={13} />
             {t('users.filters')}
             {advFilterCount > 0 && (
-              <span
-                className="grid place-items-center rounded-full"
-                style={{
-                  width: '16px', height: '16px',
-                  background: 'var(--accent)', color: 'var(--on-accent)',
-                  fontFamily: 'var(--font-mono-custom)', fontSize: '9px',
-                }}
-              >
+              <span className="grid place-items-center w-4 h-4 rounded-full bg-[var(--accent)] text-[var(--on-accent)] font-[var(--font-mono)] text-[9px]">
                 {advFilterCount}
               </span>
             )}
@@ -366,6 +315,8 @@ export function UserList() {
         onPageSizeChange={list.setPageSize}
         enableSelection
         onSelectionChange={setSelectedIds}
+        sortState={list.sortState}
+        onSortChange={list.onSortChange}
         emptyScene={hasFilters ? 'no-results' : 'empty'}
         emptyResource={t('search.users')}
         onEmptyAction={canWrite ? () => setFormOpen(true) : undefined}

@@ -104,10 +104,44 @@
     "success": "登录成功"
   },
   "search": {
-    "pages": "页面",
+    "pagesLabel": "页面",
     "users": "用户",
     "searching": "搜索中...",
-    "noResults": "未找到结果"
+    "noResults": "未找到结果",
+    "pages": {
+      "dashboard": "仪表盘",
+      "userList": "用户列表",
+      "roles": "角色与权限",
+      "orders": "订单",
+      "products": "产品",
+      "analytics": "数据分析",
+      "settings": "系统设置"
+    },
+    "kw": {
+      "dashboard": "仪表盘",
+      "home": "首页",
+      "overview": "概览",
+      "user": "用户",
+      "list": "列表",
+      "management": "管理",
+      "member": "成员",
+      "role": "角色",
+      "permission": "权限",
+      "access": "访问",
+      "privilege": "特权",
+      "order": "订单",
+      "purchase": "采购",
+      "product": "产品",
+      "item": "商品",
+      "catalog": "目录",
+      "analytics": "分析",
+      "chart": "图表",
+      "report": "报表",
+      "statistics": "统计",
+      "settings": "设置",
+      "config": "配置",
+      "preference": "偏好"
+    }
   },
   "theme": {
     "system": "跟随系统",
