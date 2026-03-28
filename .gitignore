@@ -10,7 +10,7 @@ yarn-error.log*
 pnpm-debug.log*
 *.tgz
 .next
-# tsconfig.tsbuildinfo
+tsconfig.tsbuildinfo
 # .codex
 # .cursor
 # .claude
