@@ -1,5 +1,5 @@
 # NexusAdmin 快速参考
-> 技术栈 + 目录结构 + P0 规则摘要 + 视觉规则（提炼自 admin.html）。大多数任务注入此文件即可。
+> 技术栈 + 目录结构 + 代码规范速查 + 视觉规则（提炼自 admin.html）。大多数任务注入此文件即可。
 
 ---
 
@@ -41,41 +41,18 @@ nexus-admin/
 
 ---
 
-## 三、P0 规则摘要（违反必须重写）
+## 三、代码规范速查
 
-### 样式禁令
-```
-❌ className="bg-blue-500"        → ✅ className="bg-[var(--accent)]"
-❌ className="text-gray-900"      → ✅ className="text-[var(--txt)]"
-❌ style={{ color: '#6366f1' }}   → ✅ style={{ color: 'var(--accent)' }} 或封装组件
-✅ style 属性中允许 var(--)       → className 优先用 Tailwind 任意值，封装组件首选
-```
+> P0 约束规则见 `CLAUDE.md`（始终加载）。本节只列代码模式与按钮层级。
 
-### 状态禁令
+### 状态归属
 ```
-❌ Zustand 存放 list/items/rows   → ✅ TanStack Query 管理服务端数据
-❌ useState 存放筛选条件          → ✅ URL Search Params
-❌ setQueryData 手动拼接列表      → ✅ invalidateQueries 重新 fetch
+TanStack Query → 服务端数据 / 分页 / 筛选 / CRUD 刷新
+Zustand        → auth | theme | menuCollapsed | tableViewMode
+URL Params     → 筛选条件（keyword / role / status / page / size）
 ```
 
-### 组件禁令
-```
-❌ features/ 模块互相引用         → ✅ 提取到 common/ 再共享
-❌ common/ 依赖 features/         → 单向依赖，common 不知道业务
-❌ ui/ 组件调用 useQuery          → ui/ 只做展示，无数据获取
-❌ Delete 直接调 API              → ✅ 必须经过 <ConfirmDialog>
-❌ 无权限用 disabled              → ✅ return null（隐藏）
-```
-
-### 国际化
-```
-❌ 硬编码用户可见文本            → ✅ useTranslations() + t('key')
-❌ 组件外常量直接写英文 label    → ✅ 常量存翻译键，组件内 t(key)
-❌ 工厂函数内直接写文本          → ✅ 通过参数接收 t 函数
-翻译文件: i18n/messages/{zh-CN,zh-TW,ja,en}.json
-```
-
-### 强制约束
+### 核心代码模式
 ```typescript
 // DataTable 泛型必须有 id 字段
 function DataTable<T extends { id: string }>
@@ -84,8 +61,20 @@ function DataTable<T extends { id: string }>
 const can = usePermission('user:delete');
 if (!can) return null;
 
-// 批量 CRUD 后刷新缓存
+// CRUD 后刷新缓存（禁止 setQueryData 手动拼接）
 onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.users.all })
+
+// i18n：组件外常量存 key，组件内通过 t() 解析
+// 工厂函数（如 createUserColumns）通过参数接收 t 函数
+```
+
+### 按钮层级（每区域最多 1 个 primary）
+```
+primary     → Add / Save
+outline     → Export / Reset
+warn        → Disable
+destructive → Delete（必须搭配 <ConfirmDialog>）
+ghost       → Edit / 图标按钮
 ```
 
 ---
@@ -364,17 +353,3 @@ URL 不包含 locale 前缀（localePrefix: 'never'），所有路由形如 /das
   middleware 读取新 cookie → next-intl 加载对应 messages → 页面重新渲染
 ```
 
----
-
-## 六、context 注入速查
-
-| 任务 | 注入文件 |
-|------|---------|
-| 样式 / Token | `@01a-color-tokens.md` |
-| 组件实现 | `@01a + @01b-component-tokens.md` |
-| 列表页 / 表格 | `@02-components.md @03-data-layer.md` |
-| 表单 / 编辑 | `@02-components.md @03-data-layer.md` |
-| 权限控制 | `@04-auth-permission.md` |
-| API / Mock | `@05-api-mock.md` |
-| 测试 | `@06-testing.md` |
-| 完整功能页 | `@02 @03 @04` |

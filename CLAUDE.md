@@ -1,12 +1,12 @@
 # NexusAdmin — AI 开发约束
 
+## 项目介绍
+
+通用的后台管理 Web 前端项目。技术栈禁止替换：Next.js 15 App Router · React 19 · shadcn/ui · Tailwind v4 · Zustand · TanStack Query v5 · next-intl · MSW v2 · Vitest · TypeScript 5.6
+
 ## 视觉参考
 `admin.html`（项目根目录）是唯一视觉原型，实现时以此为对齐标准。
 Dashboard 页无 HTML 原型，按 `context/02-components.md` 接口规范自由实现。
-
-## 技术栈（禁止替换）
-Next.js 15 App Router · React 19 · shadcn/ui · Tailwind v4
-Zustand · TanStack Query v5 · next-intl · MSW v2 · Vitest · TypeScript 5.6
 
 ## ❌ P0 禁止（违反必须重写）
 
@@ -44,27 +44,10 @@ Zustand · TanStack Query v5 · next-intl · MSW v2 · Vitest · TypeScript 5.6
 - 组件外常量使用翻译键字符串，在组件内通过 `t(key)` 解析
 - 工厂函数（如 `createUserColumns`）通过参数接收 `t` 函数
 
-```ts
-// 状态归属
-TanStack Query → 服务端数据 / 分页 / 筛选 / CRUD 刷新
-Zustand        → auth | theme | menuCollapsed | tableViewMode
-
-// 权限
-const can = usePermission('user:delete');
-if (!can) return null;
-
-// DataTable 泛型约束
-function DataTable<T extends { id: string }>
-
-// CRUD 刷新
-onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.users.all })
-// ❌ 禁止 setQueryData 手动拼接
-```
+代码模式见 `@context/00-quick-ref.md` 第三节（状态归属 / 权限 / DataTable / CRUD 刷新）。
 
 ## 页面骨架（三种，禁止自创）
-- **列表页**：`<PageContainer>` → ActionBar + FilterBar + `<DataTable>`
-- **表单页**：`<PageContainer>` → PageHeader + FormLayout（两列栅格）
-- **仪表盘**：`<PageContainer>` → StatCards + ChartsGrid
+列表页 / 表单页 / 仪表盘，详见 `@context/00-quick-ref.md` 第四节。
 
 ## 按钮层级（每区域最多 1 个 primary）
 primary=Add/Save · outline=Export/Reset · warn=Disable · destructive=Delete(+ConfirmDialog) · ghost=Edit/图标
