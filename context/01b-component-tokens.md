@@ -8,13 +8,11 @@
   /* Button Primary */
   --btn-primary-bg: var(--accent);  --btn-primary-bg-hover: var(--accent-hover);
   --btn-primary-bg-active: var(--accent-active);
-  --btn-primary-bg-disabled: color-mix(in srgb, var(--accent) 40%, transparent);
-  --btn-primary-text: #ffffff;  --btn-primary-text-disabled: rgba(255,255,255,0.5);
+  --btn-primary-text: #ffffff;
   --btn-primary-ring-focus: var(--shadow-focus);
   /* Button Ghost */
   --btn-ghost-bg-hover: var(--surface-1);  --btn-ghost-bg-active: var(--surface-2);
   --btn-ghost-text: var(--txt-sec);  --btn-ghost-text-hover: var(--txt);
-  --btn-ghost-text-disabled: var(--txt-muted);
   /* Button Danger */
   --btn-danger-bg: var(--btn-delete-bg);  --btn-danger-text: var(--btn-delete);
   /* Button Warn */
@@ -61,7 +59,7 @@
 className={cn(
   'bg-[var(--btn-primary-bg)] hover:not(:disabled):bg-[var(--btn-primary-bg-hover)]',
   'active:not(:disabled):bg-[var(--btn-primary-bg-active)]',
-  'disabled:bg-[var(--btn-primary-bg-disabled)] disabled:cursor-not-allowed',
+  'disabled:opacity-50 disabled:cursor-not-allowed',
   'focus-visible:shadow-[var(--btn-primary-ring-focus)] focus-visible:outline-none'
 )}
 // ❌ 禁止：isDisabled ? 'bg-indigo-300' : 'bg-indigo-500'

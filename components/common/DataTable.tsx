@@ -8,7 +8,8 @@ import {
   useReactTable,
   RowSelectionState,
 } from '@tanstack/react-table';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { SkeletonTable } from './SkeletonTable';
@@ -36,9 +37,8 @@ interface DataTableProps<T extends { id: string }> {
   enableSorting?: boolean;
   sortState?: SortingState;
   onSortChange?: (updater: SortingState | ((prev: SortingState) => SortingState)) => void;
-  enableColumnVisibility?: boolean;
-  mobileView?: 'auto' | 'table' | 'card';
-  hiddenColumns?: string[];
+  enableRowVirtualization?: boolean;  // 500+ 行时启用
+  virtualizerHeight?: number;          // 虚拟滚动容器高度，默认 600px
   paginationResource?: string;
 }
 
@@ -76,6 +76,8 @@ export function DataTable<T extends { id: string }>({
   enableSorting = true,
   sortState: externalSortState,
   onSortChange: externalOnSortChange,
+  enableRowVirtualization = false,
+  virtualizerHeight = 600,
   paginationResource,
 }: DataTableProps<T>) {
   const t = useTranslations();
@@ -130,6 +132,16 @@ export function DataTable<T extends { id: string }>({
     }
   }, [rowSelection, onSelectionChange]);
 
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  const rows = table.getRowModel().rows;
+
+  const rowVirtualizer = useVirtualizer({
+    count: enableRowVirtualization ? rows.length : 0,
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: () => (density === 'compact' ? 36 : 52),
+    overscan: 5,
+  });
+
   const totalPages = Math.ceil(total / pageSize);
 
   if (isLoading) {
@@ -164,7 +176,11 @@ export function DataTable<T extends { id: string }>({
       {/* Table wrapper */}
       <div className="rounded-[var(--table-radius)] overflow-hidden border border-[var(--table-border)] bg-[var(--white)] shadow-[var(--shadow-1)]">
         {/* Desktop table */}
-        <div className="hidden md:block overflow-x-auto">
+        <div
+          ref={enableRowVirtualization ? tableContainerRef : undefined}
+          className="hidden md:block overflow-x-auto"
+          style={enableRowVirtualization ? { height: virtualizerHeight, overflowY: 'auto' } : undefined}
+        >
           <table className="w-full border-collapse min-w-[700px]">
             <thead>
               {table.getHeaderGroups().map((hg) => (
@@ -204,7 +220,55 @@ export function DataTable<T extends { id: string }>({
               ))}
             </thead>
             <tbody>
-              {table.getRowModel().rows.map((row, index) => (
+              {enableRowVirtualization ? (() => {
+                const virtualItems = rowVirtualizer.getVirtualItems();
+                const totalSize = rowVirtualizer.getTotalSize();
+                const paddingTop = virtualItems[0]?.start ?? 0;
+                const paddingBottom = totalSize - (virtualItems[virtualItems.length - 1]?.end ?? 0);
+                return (
+                  <>
+                    {paddingTop > 0 && (
+                      <tr><td colSpan={allColumns.length} style={{ height: paddingTop }} /></tr>
+                    )}
+                    {virtualItems.map((vRow) => {
+                      const row = rows[vRow.index];
+                      return (
+                        <tr
+                          key={row.id}
+                          className={cn(
+                            'border-b border-[var(--table-border)] transition-colors cursor-pointer',
+                            row.getIsSelected()
+                              ? 'bg-[var(--table-row-selected)] shadow-[inset_4px_0_0_var(--table-row-selected-bar)]'
+                              : [
+                                  'hover:bg-[var(--table-row-hover)]',
+                                  striped && vRow.index % 2 === 1 && 'bg-[var(--table-row-stripe)]',
+                                ]
+                          )}
+                          onClick={() => enableSelection && row.toggleSelected()}
+                        >
+                          {row.getVisibleCells().map((cell) => {
+                            const isSelect = cell.column.id === 'select';
+                            return (
+                              <td
+                                key={cell.id}
+                                className={cn(
+                                  'py-2 text-[12.5px] text-[var(--txt)] align-middle',
+                                  isSelect ? 'px-0 text-center' : 'px-2.5',
+                                )}
+                              >
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                    {paddingBottom > 0 && (
+                      <tr><td colSpan={allColumns.length} style={{ height: paddingBottom }} /></tr>
+                    )}
+                  </>
+                );
+              })() : rows.map((row, index) => (
                 <tr
                   key={row.id}
                   className={cn(

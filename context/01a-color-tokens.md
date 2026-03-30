@@ -1,12 +1,9 @@
 # NexusAdmin Color Tokens
-> 颜色变量 + Spacing/Shadow/Interaction 基础值。样式任务必须注入此文件。
-
-# NexusAdmin Design Tokens
-> AI 使用规则：所有颜色/间距/阴影通过以下变量访问，禁止 Tailwind 颜色类和硬编码值。
+> 颜色变量 + Spacing/Shadow/Interaction 基础值 + CSS 工具类。样式任务必须注入此文件。
 
 ---
 
-## 一、颜色变量（styles/globals.css）
+## 一、颜色变量（app/globals.css）
 
 ```css
 /* ── 浅色主题 :root ───────────────────── */
@@ -40,6 +37,11 @@
   --accent-active: #4338ca;
   --accent-light:  #eef2ff;
   --accent-mid:    #c7d2fe;
+  --on-accent:     #ffffff;  /* text on accent bg */
+
+  /* Avatar Colors */
+  --avatar-1: #6366f1;  --avatar-2: #8b5cf6;  --avatar-3: #0ea5e9;
+  --avatar-4: #10b981;  --avatar-5: #f59e0b;  --avatar-6: #ef4444;
 
   /* Role Badges */
   --badge-bg:    #ffffff;
@@ -79,6 +81,8 @@
   --role-admin:  #93c5fd;  --role-editor: #c084fc;  --role-viewer: #e2e8f0;
   --accent:        #818cf8;  --accent-hover:  #6366f1;
   --accent-light:  #1e2356;
+  --avatar-1: #818cf8;  --avatar-2: #a78bfa;  --avatar-3: #38bdf8;
+  --avatar-4: #34d399;  --avatar-5: #fbbf24;  --avatar-6: #f87171;
   --btn-delete:     #f87171;  --btn-delete-bg:  #7f1d1d;
   --btn-disable:    #fbbf24;  --btn-disable-bg: #78350f;
   --success:  #34d399;  --success-bg: #064e3b;  --success-txt: #a1f2d1;
@@ -98,7 +102,7 @@
 |------|----|------|
 | `--font-display` | `'Bricolage Grotesque', sans-serif` | 页面标题、ActionBar 标题、高亮字 |
 | `--font-body` | `'Instrument Sans', sans-serif` | 正文、表单、按钮 |
-| `--font-mono-custom` | `'DM Mono', monospace` | 徽章、数字、版本号、代码 |
+| `--font-mono` | `'DM Mono', monospace` | 徽章、数字、版本号、代码 |
 | `--stripe` | `var(--surface-1)` | 下拉列表 hover 背景（alias） |
 
 > Google Fonts 必须在 `layout.tsx` `<head>` 中通过 `<link>` 引入（Bricolage Grotesque + DM Mono + Instrument Sans）。
@@ -134,7 +138,7 @@
   --duration-fast:   100ms;  --duration-normal: 150ms;
   --duration-slow:   250ms;  --duration-xslow:  350ms;
   --ease-default: cubic-bezier(.4,0,.2,1);
-  --scale-press:  .98;  --scale-hover-up: 1.02;
+  --scale-press:  .98;
 }
 
 [data-theme="dark"] {
@@ -143,6 +147,38 @@
   --shadow-3: 0 12px 32px rgba(0,0,0,.4);
   --shadow-focus: 0 0 0 3px rgba(129,140,248,.2);
 }
+```
+
+> **响应式覆盖**：`≤1024px` → `--sidebar-w: 0px`, `--page-px: 16px`；`≤768px` → `--page-px: 12px`；`≤480px` → `--page-px: 10px`
+
+---
+
+## 三、CSS 工具类（nx-*）
+
+> `app/globals.css` 中预定义了原生控件工具类，直接使用 className，无需内联样式。
+
+| 类名 | 用途 | 高度 |
+|------|------|------|
+| `.nx-input` | 表单输入框（表单页、ConfirmDialog） | 32px |
+| `.nx-input-sm` | 筛选栏输入框（FilterBar compact）| 28px |
+| `.nx-input-error` | 配合 `.nx-input` 展示校验错误状态 | — |
+| `.nx-select` | 表单下拉选择 | 32px |
+| `.nx-select-sm` | 筛选栏下拉（FilterBar compact）| 28px，`width:auto` |
+| `.nx-select-mini` | Header 用户面板内迷你下拉（主题/语言）| 26px，等宽字体 |
+| `.nx-label` | 表单 label（11px uppercase 600）| — |
+| `.nx-menu-item` | Header Dropdown 可点击菜单项 | — |
+| `.nx-menu-row` | Header Dropdown 非交互行（icon+控件）| — |
+| `.nx-divider` | Dropdown 分隔线 | 1px |
+
+```tsx
+// ✅ 正确：使用 nx-* 工具类
+<input className="nx-input" type="text" />
+<input className="nx-input nx-input-sm" type="text" />  {/* FilterBar */}
+<select className="nx-select-sm">...</select>
+<label className="nx-label">Email</label>
+
+// ❌ 禁止：内联样式手写输入框样式
+<input style={{ height: 32, border: '1px solid var(--border)' }} />
 ```
 
 ---

@@ -5,29 +5,17 @@
 
 ## 一、状态归属规则 🔴 P0（硬性约束）
 
-```
-TanStack Query 管理：
-  ✅ 服务端数据（用户列表、详情、图表数据）
-  ✅ 分页状态（page、pageSize）
-  ✅ 筛选参数（作为 queryKey 的一部分）
-  ✅ 增删改查后的缓存失效（invalidate）
-  ✅ 乐观更新
+**TanStack Query**：服务端数据（列表/详情/图表）、分页（page/pageSize）、筛选参数（作为 queryKey）、CRUD 后缓存失效（invalidate）、乐观更新
 
-Zustand 管理：
-  ✅ auth（token / user / permissions）
-  ✅ theme（light / dark / system）
-  ✅ menuCollapsed（侧边栏折叠）
-  ✅ tableViewMode（table / card，per tableId）
+**Zustand**：`useAuthStore`（token/user/permissions）、`useThemeStore`（light/dark/system）、`useMenuStore`（collapsed/mobileOpen）、`useTableViewModeStore`（table/card，per tableId）
 
-URL Search Params 管理：
-  ✅ 筛选条件（keyword / role / status / page / size）
+**URL Search Params**：筛选条件（keyword/role/status/page/size）
 
-禁止：
-  ❌ Zustand 存放 list / items / rows / records（服务端数据）
-  ❌ useState 存放跨组件筛选条件
-  ❌ URL Params 与 TanStack Query 双写同一筛选
-  ❌ 手动 setQueryData 拼接列表数据（用 invalidate）
-```
+**禁止**：
+- ❌ Zustand 存放 `list`/`items`/`rows`/`records`（服务端数据）
+- ❌ `useState` 存放跨组件筛选条件
+- ❌ URL Params 与 TanStack Query 双写同一筛选
+- ❌ 手动 `setQueryData` 拼接列表数据（用 `invalidate`）
 
 ---
 
@@ -43,11 +31,17 @@ interface AuthState {
   clearAuth:   () => void;
 }
 export const useAuthStore = create<AuthState>()(
-  devtools(persist(devGuard((set) => ({
-    token: null, user: null, permissions: [],
-    setAuth:  (token, user, permissions) => set({ token, user, permissions }),
-    clearAuth: () => set({ token: null, user: null, permissions: [] }),
-  })), { name: 'nexus-auth' }), { name: 'NexusAuth' })
+  devtools(
+    persist(
+      (set) => ({
+        token: null, user: null, permissions: [],
+        setAuth:   (token, user, permissions) => set({ token, user, permissions }),
+        clearAuth: () => set({ token: null, user: null, permissions: [] }),
+      }),
+      { name: 'nexus-auth' }
+    ),
+    { name: 'NexusAuth' }
+  )
 );
 
 // store/themeStore.ts
@@ -73,7 +67,7 @@ export const useThemeStore = create<{ mode: ThemeMode; setMode: (m: ThemeMode) =
 // lib/fetch.ts
 export async function apiFetch<T>(url: string, options?: RequestInit): Promise<T> {
   const token = useAuthStore.getState().token;
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${url}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL ?? ''}${url}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -86,8 +80,11 @@ export async function apiFetch<T>(url: string, options?: RequestInit): Promise<T
     window.location.href = '/login';
     throw new Error('Unauthorized');
   }
-  const data = await res.json();
-  if (data.code !== 0) throw new Error(data.message);
+  const data: ApiResponse<T> = await res.json();
+  if (data.code !== 0) {
+    // 必须用 Object.assign 附加 code/errors，useFormError 依赖这两个属性
+    throw Object.assign(new Error(data.message), { code: data.code, errors: data.errors });
+  }
   return data.data as T;
 }
 ```
@@ -101,42 +98,37 @@ export async function apiFetch<T>(url: string, options?: RequestInit): Promise<T
 // queries/keys.ts
 export const queryKeys = {
   users: {
-    all:  ['users'] as const,
-    list: (filters: unknown) => ['users', 'list', filters] as const,
+    all:    ['users'] as const,
+    list:   (filters: unknown) => ['users', 'list', filters] as const,
     detail: (id: string) => ['users', id] as const,
   },
+  menu:      { all: ['menu'] as const },
+  enums:     { all: ['enums'] as const },
+  dashboard: { stats: ['dashboard', 'stats'] as const },
+  search:    { users: (q: string) => ['search', 'users', q] as const },
 };
 ```
 
 ### useList — URL↔Query 同步
 ```typescript
 // hooks/useList.ts — URL Search Params 驱动 TanStack Query
-// 读取 URL 中的 page/size/keyword 等参数，构建 queryKey，返回数据 + setFilter/setPage/resetFilters
-// placeholderData 保留旧数据，翻页时不闪烁
-export function useList<T>({ queryKey, queryFn, defaultPageSize = 20 }) {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const filters  = Object.fromEntries(searchParams.entries());
-  const page     = Number(searchParams.get('page') ?? 1);
-  const pageSize = Number(searchParams.get('size') ?? defaultPageSize);
+// placeholderData 保留旧数据，翻页/筛选时不闪烁
+interface UseListOptions<T> {
+  queryKey:        readonly unknown[];
+  queryFn:         (params: ListParams) => Promise<T>;
+  defaultPageSize?: number;
+}
 
-  const query = useQuery({
-    queryKey: [...queryKey, filters, page, pageSize],
-    queryFn:  () => queryFn({ ...filters, page, pageSize }),
-    placeholderData: (prev) => prev,
-  });
-
-  const setFilter = (key: string, value: string) => {
-    const p = new URLSearchParams(searchParams);
-    value ? p.set(key, value) : p.delete(key);
-    p.set('page', '1');
-    router.replace(`?${p.toString()}`, { scroll: false });
-  };
-
-  return { ...query, filters, page, pageSize, setFilter,
-           setPage: (n: number) => { const p = new URLSearchParams(searchParams); p.set('page', String(n)); router.replace(`?${p}`); },
-           setPageSize: (n: number) => { const p = new URLSearchParams(searchParams); p.set('size', String(n)); p.set('page', '1'); router.replace(`?${p}`); },
-           resetFilters: () => router.replace('?') };
+export function useList<T>({ queryKey, queryFn, defaultPageSize = 20 }: UseListOptions<T>) {
+  // 返回值（在 ...query 基础上扩展）：
+  // filters: Record<string, string>     — 当前所有 URL params
+  // page / pageSize: number
+  // setFilter(key, value)               — 单字段更新，value 空时删除，重置到第 1 页
+  // setFilters(updates)                 — 批量字段更新，重置到第 1 页
+  // setPage(n) / setPageSize(n)
+  // resetFilters()                      — 清空所有 params
+  // sortState: SortingState             — 从 URL "sort" 参数派生（格式 "field:asc|desc"）
+  // onSortChange(updater)               — 更新 URL sort 参数
 }
 ```
 
@@ -251,10 +243,18 @@ return (
 ### useFormPage — 表单页全套封装
 ```typescript
 // hooks/templates/useFormPage.ts
-// 参数：resource / id（有=编辑,无=新建）/ schema(zod) / fetchFn / toFormValues / submitFn / invalidateKeys / onSuccess
+interface UseFormPageOptions<TFormData extends FieldValues, TEntity> {
+  resource:      string;
+  id?:           string;              // 有 = 编辑模式（触发 fetchFn）；无 = 新建
+  schema:        ZodSchema;           // zod schema，用于 zodResolver
+  fetchFn?:      (id: string) => Promise<TEntity>;
+  toFormValues?: (entity: TEntity) => TFormData;
+  submitFn:      (data: TFormData) => Promise<unknown>;
+  invalidateKeys?: readonly unknown[][];
+  onSuccess?:    () => void;
+}
 // 返回：{ form, isEdit, isLoading, isPending, submit }
-// 内部集成：useQuery(编辑时加载) + useForm(zodResolver) + useFormError(API校验映射) + useAction(提交+invalidate+toast)
-// 详见 @context/00-quick-ref.md 或规格文件 §27.2
+// 内部集成：useQuery(编辑时) + useForm(zodResolver 懒加载) + useFormError(API 校验映射) + useAction(提交+invalidate+toast)
 ```
 
 ---
@@ -284,10 +284,9 @@ export interface GlobalSearchResult {
 }
 
 export function useGlobalSearch(): GlobalSearchResult
-// 查询键：queryKeys.search.users(q)，staleTime: 30s，placeholderData: keepPreviousData
-// Pages 跳转：直接路径（/dashboard, /users），无 locale 前缀
-// Users 跳转：/users?keyword={name}
 ```
+
+查询键 `queryKeys.search.users(q)`，`staleTime: 30s`，`placeholderData: keepPreviousData`。Pages 跳转直接路径（`/dashboard`、`/users`），无 locale 前缀；Users 跳转 `/users?keyword={name}`。
 
 ---
 
